@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form enctype="multipart/form-data" th:method="post" th:action="@{file/build}">
+    <input type="text" name="tag" placeholder="tag"/>
+    <input type="file" name="files" multiple="multiple"/>
+    <textarea name="dockerfile" placeholder="dockerfile"></textarea>
+    <input type="submit" value="上传"/>
+</form>
+</body>
+</html>
