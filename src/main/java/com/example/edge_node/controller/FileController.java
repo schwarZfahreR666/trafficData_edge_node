@@ -45,7 +45,10 @@ public class FileController {
         fileService.saveFiles(files);
         imageService.buildImage(tag);
         containerService.create(tag,tag,null);
-        fileService.copyTarToContainer(tag,"/Users/zhangran/Documents/edge_node/files/test.tar","/code/");
+//        fileService.copyTarToContainer(tag,"/Users/zhangran/Documents/edge_node/files/test.tar","/code/");
+        fileService.copyFileToContainer(tag,"/Users/zhangran/Documents/edge_node/files/test.txt","/code/");
+
+        Thread.sleep(5000);
         containerService.containerStart(tag);
 
 

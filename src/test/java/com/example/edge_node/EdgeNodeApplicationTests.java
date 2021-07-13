@@ -63,19 +63,21 @@ class EdgeNodeApplicationTests {
     @Test
     void testContainer() throws IOException, InterruptedException {
 
-        containerService.create("busybox","hello1","top");
+        containerService.create("test","hello1","top");
 //        fileService.copyTarToContainer("hello1","/Users/zhangran/Documents/edge_node/files/test.tar","/");
-//        fileService.copyFileToContainer("hello1","/Users/zhangran/Documents/edge_node/files/requirements.txt","/code/");
+        fileService.copyFileToContainer("hello1","/Users/zhangran/Documents/edge_node/files/requirements.txt","/code/");
         containerService.containerStart("hello1");
 //        System.out.println(containerService.log("hello1"));
 
-        System.out.println(monitorService.getStats("hello1"));
+//        System.out.println(monitorService.getStats("hello1"));
 //        System.out.println(monitorService.getInfo());
-//        System.out.println(monitorService.inspectContainer("hello1"));
+        System.out.println(monitorService.inspectContainer("hello1"));
 //        System.out.println(monitorService.getInspect("hello1"));
 //
-//        System.out.println(fileService.copyFromContainer("hello1","/code/requirements.txt"));
+        System.out.println(fileService.copyFromContainer("hello1","/code/requirements.txt"));
+//        containerService.stop("hello1");
         containerService.stop("hello1");
+//        System.out.println(monitorService.inspectContainer("hello1"));
 //        System.out.println(monitorService.getInspect("hello1"));
 //        System.out.println(containerService.log("hello1"));
 //

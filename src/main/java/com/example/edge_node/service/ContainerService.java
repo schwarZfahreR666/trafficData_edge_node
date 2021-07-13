@@ -29,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 public class ContainerService {
     @Autowired
     DockerService dockerService;
+    @Autowired
+    MonitorService monitorService;
 
     public List<Container> list() {
         DockerClient cli = dockerService.getDockerClient();
@@ -37,17 +39,15 @@ public class ContainerService {
         return cli.listContainersCmd().withShowAll(true).exec();
     }
 
-    public InspectContainerResponse info(String id) {
-        DockerClient cli = dockerService.getDockerClient();
-        if (cli == null)
-            return null;
-        return cli.inspectContainerCmd(id).exec();
-    }
+
 
     public void stop(String id) {
         DockerClient cli = dockerService.getDockerClient();
         if (cli == null)
             return;
+        if (!"running".equals(monitorService.inspectContainer(id).getState().getStatus())){
+            return;
+        }
         cli.stopContainerCmd(id).exec();
     }
 

@@ -2,6 +2,7 @@ package com.example.edge_node.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.edge_node.pojo.HostInfo;
 import com.example.edge_node.pojo.Status;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class MonitorService {
     @Autowired
     DockerService dockerService;
-    @Value("${docker.url}")
+    @Value("${docker.restUrl}")
     private String url;
     /*获取单个container信息*/
     public Status getStats(String id){
@@ -69,7 +70,6 @@ public class MonitorService {
 
         JSONObject jsonObject =  JSONObject.parseObject(statistics);
         String running = jsonObject.getJSONObject("State").getString("Running");
-        System.out.println(running);
 
 
         return statistics;
@@ -81,18 +81,26 @@ public class MonitorService {
         if (cli == null)
             return null;
         InspectContainerResponse containerInfo = cli.inspectContainerCmd(id)
-                .withContainerId(id)
+//                .withContainerId(id)
                 .exec();
+
         return containerInfo;
     }
 
     /*获取整体docker信息*/
-    public Info getInfo(){
+    public HostInfo getInfo(){
         DockerClient cli = dockerService.getDockerClient();
         if (cli == null)
             return null;
         Info dockerInfo = cli.infoCmd().exec();
+        HostInfo hostInfo = new HostInfo();
+        hostInfo.setContainers(dockerInfo.getContainers());
+        hostInfo.setContainersRunning(dockerInfo.getContainersRunning());
+        hostInfo.setContainersStopped(dockerInfo.getContainersStopped());
+        hostInfo.setImages(dockerInfo.getImages());
+        hostInfo.setMemTotal(dockerInfo.getMemTotal() / 1024 );
+        hostInfo.setContainersPaused(dockerInfo.getContainersPaused());
 
-        return dockerInfo;
+        return hostInfo;
     }
 }
