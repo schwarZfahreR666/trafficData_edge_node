@@ -5,6 +5,8 @@ import com.github.dockerjava.api.DockerClient;
 
 import com.mysql.cj.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +66,10 @@ public class FileService {
             out.print(content);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            log.error("dockerfile存储失败！");
             return -1;
         }
+        log.info("dockerfile存储成功！");
         return 0;
     }
 
@@ -94,14 +98,15 @@ public class FileService {
                 .exec();
     }
 
-    public String copyFromContainer(String id,String filepath){
+    public String copyFromContainer(String id,String remotePath) throws IOException {
         DockerClient cli = dockerService.getDockerClient();
         if (cli == null)
             return null;
-        InputStream response = cli.copyArchiveFromContainerCmd(id, filepath).exec();
+//        InputStream response = cli.copyArchiveFromContainerCmd(id, remotePath).exec();
+        TarArchiveInputStream tarStream = new TarArchiveInputStream(cli.copyArchiveFromContainerCmd(id, remotePath).exec());
 
         // read the stream fully. Otherwise, the underlying stream will not be closed.
-        return consumeAsString(response);
+        return unTar(tarStream);
     }
 
     public String consumeAsString(InputStream response) {
@@ -123,5 +128,69 @@ public class FileService {
         } finally {
             IOUtils.closeQuietly(response);
         }
+    }
+
+    public String inputStreamToString(InputStream is) {
+
+        try {
+            ByteArrayOutputStream boa = new ByteArrayOutputStream();
+            int len = 0;
+            byte[] buffer = new byte[1024];
+
+            while((len = is.read(buffer))!=-1){
+                boa.write(buffer,0,len);
+            }
+            is.close();
+            boa.close();
+            byte[] result = boa.toByteArray();
+
+            String temp = new String(result);
+            //识别编码
+            if(temp.contains("utf-8")){
+                return new String(result,"utf-8");
+            }else if(temp.contains("gb2312")){
+                return new String(result,"gb2312");
+            }else{
+                return new String(result,"utf-8");
+            }
+
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public String unTar(TarArchiveInputStream tis)
+            throws IOException {
+        TarArchiveEntry tarEntry = null;
+        String res = "";
+        while ((tarEntry = tis.getNextTarEntry()) != null) {
+            if (!tarEntry.isDirectory()){
+
+                ByteArrayOutputStream boa = new ByteArrayOutputStream();
+                int len = 0;
+                byte[] buffer = new byte[1024];
+                while((len = tis.read(buffer))!=-1){
+                    boa.write(buffer,0,len);
+                }
+                boa.close();
+                byte[] result = boa.toByteArray();
+                String temp = new String(result);
+                //识别编码
+                if(temp.contains("utf-8")){
+                    res += new String(result,"utf-8");
+                }else if(temp.contains("gb2312")){
+                    res += new String(result,"gb2312");
+                }else{
+                    res += new String(result,"utf-8");
+                }
+
+            }
+        }
+        tis.close();
+        return res;
     }
 }

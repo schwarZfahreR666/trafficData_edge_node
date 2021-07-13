@@ -51,25 +51,23 @@ public class ImageService {
 
 
     /*根据Dockerfile创建容器*/
-    public void buildImage(String id) throws Exception {
+    public String buildImage(String id) throws Exception {
         DockerClient cli = dockerService.getDockerClient();
         if (cli == null)
-            return;
-        System.out.println(files);
+            return null;
+
         File baseDir = new File(files);
 
         Collection<File> files = FileUtils.listFiles(baseDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
         File dockerfile = new File(baseDir + "/dockerfile");
         //可以把dockerfile转存再编译,要add的文件放到basedir下即可
-        cli.buildImageCmd()
+        return cli.buildImageCmd()
                 .withNoCache(true)
                 .withTag(id)
                 .withBaseDirectory(baseDir)
                 .withDockerfile(dockerfile)
                 .start()
                 .awaitImageId();
-
-
     }
 
     private File fileFromBuildTestResource(String resource) {

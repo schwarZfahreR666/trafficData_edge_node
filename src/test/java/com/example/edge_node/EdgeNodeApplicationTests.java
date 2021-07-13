@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -63,23 +64,26 @@ class EdgeNodeApplicationTests {
     @Test
     void testContainer() throws IOException, InterruptedException {
 
-        containerService.create("test","hello1","top");
+        containerService.create("road","hello1",null);
 //        fileService.copyTarToContainer("hello1","/Users/zhangran/Documents/edge_node/files/test.tar","/");
-        fileService.copyFileToContainer("hello1","/Users/zhangran/Documents/edge_node/files/requirements.txt","/code/");
+        fileService.copyFileToContainer("hello1","/Users/zhangran/Documents/edge_node/files/test.txt","/code/");
         containerService.containerStart("hello1");
-//        System.out.println(containerService.log("hello1"));
+
 
 //        System.out.println(monitorService.getStats("hello1"));
 //        System.out.println(monitorService.getInfo());
         System.out.println(monitorService.inspectContainer("hello1"));
 //        System.out.println(monitorService.getInspect("hello1"));
+        while(!"exited".equals(monitorService.inspectContainer("hello1").getState().getStatus())){
+            System.out.println("wait!");
+        }
 //
-        System.out.println(fileService.copyFromContainer("hello1","/code/requirements.txt"));
+        System.out.println(fileService.copyFromContainer("hello1","/code/res"));
 //        containerService.stop("hello1");
         containerService.stop("hello1");
 //        System.out.println(monitorService.inspectContainer("hello1"));
 //        System.out.println(monitorService.getInspect("hello1"));
-//        System.out.println(containerService.log("hello1"));
+        System.out.println(containerService.log("hello1"));
 //
         containerService.delete("hello1");
     }
