@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -98,6 +99,14 @@ class EdgeNodeApplicationTests {
         Path targetPath = Paths.get("/Users/zhangran/Documents/edge_node/files");
 
         ZipUtils.unPacket(file,targetPath);
+    }
+    @Test
+    void testSystemMonitor(){
+        try {
+            System.out.println(monitorService.SystemMonitor());
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
     }
 
 

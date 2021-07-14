@@ -24,6 +24,12 @@ public class BaseController {
         return "index";
     }
 
+    @RequestMapping({"/list"})
+    public String toList(Model model){
+        return "list";
+    }
+
+
     @RequestMapping("/toLogin")
     public String toLogin(){
         return "login";

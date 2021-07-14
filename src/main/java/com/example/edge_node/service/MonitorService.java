@@ -1,9 +1,11 @@
 package com.example.edge_node.service;
 
+import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.example.edge_node.pojo.HostInfo;
-import com.example.edge_node.pojo.Status;
+import com.example.edge_node.pojo.*;
+import com.example.edge_node.utils.IpUtil;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
 import com.github.dockerjava.api.command.CreateContainerResponse;
@@ -14,12 +16,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import oshi.SystemInfo;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.util.Util;
+import oshi.hardware.CentralProcessor.TickType;
+
+import java.net.SocketException;
+import java.util.Properties;
 
 /**
  * Create by zhangran
@@ -103,4 +110,67 @@ public class MonitorService {
 
         return hostInfo;
     }
+
+
+    public SysMonitor SystemMonitor() throws SocketException {
+        final long serialVersionUID = 1L;
+
+        final int OSHI_WAIT_SECOND = 1000;
+
+
+        SysMonitor sys = new SysMonitor();
+
+        SystemInfo si = new SystemInfo();
+        HardwareAbstractionLayer hal = si.getHardware();
+
+        CentralProcessor processor = hal.getProcessor();
+
+        /**
+         * 设置CPU信息
+         */
+
+        long[] prevTicks = processor.getSystemCpuLoadTicks();
+        Util.sleep(OSHI_WAIT_SECOND);
+        long[] ticks = processor.getSystemCpuLoadTicks();
+        long nice = ticks[TickType.NICE.getIndex()] - prevTicks[TickType.NICE.getIndex()];
+        long irq = ticks[TickType.IRQ.getIndex()] - prevTicks[TickType.IRQ.getIndex()];
+        long softirq = ticks[TickType.SOFTIRQ.getIndex()] - prevTicks[TickType.SOFTIRQ.getIndex()];
+        long steal = ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()];
+        long cSys = ticks[TickType.SYSTEM.getIndex()] - prevTicks[TickType.SYSTEM.getIndex()];
+        long user = ticks[TickType.USER.getIndex()] - prevTicks[TickType.USER.getIndex()];
+        long iowait = ticks[TickType.IOWAIT.getIndex()] - prevTicks[TickType.IOWAIT.getIndex()];
+        long idle = ticks[TickType.IDLE.getIndex()] - prevTicks[TickType.IDLE.getIndex()];
+        long totalCpu = user + nice + cSys + idle + iowait + irq + softirq + steal;
+        sys.setCpuNum(processor.getLogicalProcessorCount());
+        sys.setCpuTotal(totalCpu);
+        sys.setCpuSys(cSys);
+        sys.setCpuUsed(user);
+        sys.setCpuWait(iowait);
+        sys.setCpuFree(idle);
+
+        /**
+         * 设置内存信息
+         */
+        GlobalMemory memory = hal.getMemory();
+
+        sys.setMemTotal(NumberUtil.div(memory.getTotal(), (1024 * 1024 * 1024), 2));
+        sys.setMemUsed(NumberUtil.div(memory.getTotal() - memory.getAvailable(), (1024 * 1024 * 1024), 2));
+        sys.setMemFree(NumberUtil.div(memory.getAvailable(), (1024 * 1024 * 1024), 2));
+        sys.setMemUsage(NumberUtil.mul(NumberUtil.div(memory.getTotal() - memory.getAvailable(), memory.getTotal(), 4), 100));
+
+        /**
+         * 设置服务器信息
+         */
+
+        Properties props = System.getProperties();
+        sys.setComputerName(IpUtil.getHostIp());
+        sys.setComputerIp(NetUtil.getLocalhostStr());
+        sys.setOsName(props.getProperty("os.name"));
+        sys.setOsArch(props.getProperty("os.arch"));
+        sys.setUserDir(props.getProperty("user.dir"));
+
+        return sys;
+
+    }
+
 }
