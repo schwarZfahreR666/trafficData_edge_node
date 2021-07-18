@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="icon" href="favicon.ico" th:href="@{/favicon.ico}" type="image/ico">
+  <title>边缘节点管理系统</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+<link href="css/materialdesignicons.min.css" rel="stylesheet" th:href="@{/css/materialdesignicons.min.css}">
+<link href="css/style.min.css" rel="stylesheet" th:href="@{/css/style.min.css}">
+  <link href="css/loading.css" rel="stylesheet" th:href="@{/css/loading.css}">
+</head>
+
+<body data-theme="default" data-sidebarbg="color_8" data-headerbg="default" data-logobg="color_8">
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+<div th:insert="~{Nav :: #copy-nav}"></div>
+    <!--头部信息-->
+    <header class="lyear-layout-header" >
+
+      <nav class="navbar navbar-default">
+        <div class="topbar">
+
+          <div class="topbar-left">
+            <div class="lyear-aside-toggler">
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+            </div>
+            <span class="navbar-page-title"> 容器管理 </span>
+          </div>
+
+
+
+        </div>
+      </nav>
+
+    </header>
+    <!--End 头部信息-->
+    <!--页面主要内容-->
+    <main class="lyear-layout-content">
+
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+
+
+              <div class="card-body">
+
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>容器名</th>
+                        <th>镜像</th>
+                        <th>创建日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="container : ${containers}">
+
+                        <td th:text="${container.getNames()[0]}"></td>
+                        <td th:text="${container.getImage()}"></td>
+                        <td th:text="${#dates.format(container.getCreated()*1000,'yyyy-MM-dd HH:mm:ss')} + 'MB'"></td>
+                        <td th:text="${container.getStatus()}"></td>
+                        <td>
+                          <div class="btn-group">
+                            <a class="btn btn-xs btn-default" href="#!" title="启动容器" data-toggle="modal" data-target="#exampleModal"><i class="mdi mdi-skip-next"></i></a>
+
+                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="exampleModalLabel">启动容器</h4>
+                                      </div>
+                                      <div class="modal-body">
+                                        <form enctype="multipart/form-data" id="startForm" th:method="post" th:action="@{/ctn/startctn}">
+                                          <div class="form-group">
+                                            <label for="id" class="control-label">id:</label>
+                                            <input type="text" class="form-control" id="id" name="id" placeholder="id" th:value="${container.getId()}">
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="input" class="control-label">输入数据(若有):</label>
+                                            <textarea class="form-control" id="input" name="input" placeholder="Input"></textarea>
+                                          </div>
+                                        </form>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        <button type="submit" class="btn btn-primary" data-loading-text="处理中..." th:onclick="add('确定启动容器吗？','startForm')">确定</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                            <a class="btn btn-xs btn-default" href="#!" th:data-res="${container.getId()}" onclick="getRes(this.getAttribute('data-res'));" title="获取结果" data-toggle="modal" data-target="#resModal"><i class="mdi mdi-database"></i></a>
+
+                            <div class="modal fade" id="resModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="resModalLabel">计算结果</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                    <ul class="res_data"></ul>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <a class="btn btn-xs btn-default" href="#!" th:data-log="${container.getId()}" onclick="getLog(this.getAttribute('data-log'));" title="获取日志" data-toggle="modal" data-target="#logModal"><i class="mdi mdi-locker-multiple"></i></a>
+
+                            <div class="modal fade" id="logModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="logModalLabel">容器日志</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                    <ul class="log_data"></ul>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <a class="btn btn-xs btn-default" href="#!" th:href="@{'/ctn/delctn?id=' + ${container.getId()}}" title="删除" data-toggle="tooltip"><i class="mdi mdi-window-close"></i></a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+
+              </div>
+              </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </main>
+    <!--End 页面主要内容-->
+  </div>
+</div>
+<div class="loading" id="loading">
+  <figure class="loading pic">
+    <div class="loading dot white"></div>
+    <div class="loading dot"></div>
+    <div class="loading dot"></div>
+    <div class="loading dot"></div>
+    <div class="loading dot"></div>
+  </figure>
+</div>
+<script type="text/javascript" src="js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" src="js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" src="js/perfect-scrollbar.min.js" th:src="@{/js/perfect-scrollbar.min.js}"></script>
+<script type="text/javascript" src="js/main.min.js" th:src="@{/js/main.min.js}"></script>
+<script type="text/javascript">
+  jQuery('.loading').hide();
+function add(mess,formid){
+  if(confirm(mess)){
+    var form = document.getElementById(formid);
+    form.submit();
+    jQuery('.loading').show();
+  }
+}
+function getLog(id){
+  $.ajax({
+    url: '/data/ctnlog?id=' + id,
+    type: 'get',
+    error : function() {
+      alert('smx失败 ');
+    },
+    success: function (data) {
+
+      jQuery(".log_data").text(data);
+    }
+  })
+}
+
+  function getRes(id){
+    $.ajax({
+      url: '/data/ctnres?id=' + id,
+      type: 'get',
+      error : function() {
+        jQuery(".res_data").text("无获取数据");
+      },
+      success: function (data) {
+
+        jQuery(".res_data").text(data);
+      }
+    })
+  }
+</script>
+</body>
+</html>

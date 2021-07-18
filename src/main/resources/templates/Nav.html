@@ -23,8 +23,9 @@
 
         <nav class="sidebar-main">
           <ul class="nav nav-drawer">
-            <li class="nav-item"> <a href="users.html" th:href="@{'/admin/userlist/1/' + ${token}}"><i class="mdi mdi-format-align-justify"></i> 用户列表</a> </li>
-            <li class="nav-item"> <a href="NavHead.html" th:href="@{'/admin/movielist/1/' + ${token}}"><i class="mdi mdi-format-align-justify"></i> 电影列表</a> </li>
+            <li class="nav-item"> <a href="users.html" th:href="@{/}"><i class="mdi mdi-sitemap"></i> 节点监控</a> </li>
+            <li class="nav-item"> <a href="users.html" th:href="@{/imageslist/}"><i class="mdi mdi-format-align-justify"></i> 镜像管理</a> </li>
+            <li class="nav-item"> <a href="Nav.html" th:href="@{/ctnlist/}"><i class="mdi mdi-format-align-justify"></i> 容器管理</a> </li>
           </ul>
         </nav>
 
@@ -32,29 +33,6 @@
 
     </aside>
     <!--End 左侧导航-->
-
-    <!--头部信息-->
-    <header class="lyear-layout-header" id="copy-head">
-
-      <nav class="navbar navbar-default">
-        <div class="topbar">
-
-          <div class="topbar-left">
-            <div class="lyear-aside-toggler">
-              <span class="lyear-toggler-bar"></span>
-              <span class="lyear-toggler-bar"></span>
-              <span class="lyear-toggler-bar"></span>
-            </div>
-            <span class="navbar-page-title"> 电影列表 </span>
-          </div>
-
-
-
-        </div>
-      </nav>
-
-    </header>
-    <!--End 头部信息-->
 
   </div>
 </div>

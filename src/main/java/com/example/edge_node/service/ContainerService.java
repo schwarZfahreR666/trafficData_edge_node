@@ -93,7 +93,7 @@ public class ContainerService {
         DockerClient cli = dockerService.getDockerClient();
         if (cli == null)
             return;
-        cli.startContainerCmd(id);
+        cli.startContainerCmd(id).exec();
     }
 
     /*重启容器*/

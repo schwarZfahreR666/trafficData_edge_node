@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="icon" href="favicon.ico" th:href="@{/favicon.ico}" type="image/ico">
+  <title>边缘节点管理系统</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+<link href="css/materialdesignicons.min.css" rel="stylesheet" th:href="@{/css/materialdesignicons.min.css}">
+<link href="css/style.min.css" rel="stylesheet" th:href="@{/css/style.min.css}">
+  <link href="css/loading.css" rel="stylesheet" th:href="@{/css/loading.css}">
+</head>
+
+<body data-theme="default" data-sidebarbg="color_8" data-headerbg="default" data-logobg="color_8">
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+<div th:insert="~{Nav :: #copy-nav}"></div>
+    <!--头部信息-->
+    <header class="lyear-layout-header" >
+
+      <nav class="navbar navbar-default">
+        <div class="topbar">
+
+          <div class="topbar-left">
+            <div class="lyear-aside-toggler">
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+            </div>
+            <span class="navbar-page-title"> 镜像管理 </span>
+          </div>
+
+
+
+        </div>
+      </nav>
+
+    </header>
+    <!--End 头部信息-->
+    <!--页面主要内容-->
+    <main class="lyear-layout-content">
+
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+
+              <div class="card-toolbar clearfix">
+                <div class="toolbar-btn-action">
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">新增</button>
+                  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title" id="exampleModalLabel">新增镜像</h4>
+                        </div>
+                        <div class="modal-body">
+                          <form enctype="multipart/form-data" id="addForm" th:method="post" th:action="@{/image/build}">
+                            <div class="form-group">
+                              <label for="tag" class="control-label">tag:</label>
+                              <input type="text" class="form-control" id="tag" name="tag" placeholder="tag">
+                            </div>
+                            <div class="form-group">
+                              <label for="dockerfile" class="control-label">dockerfile:</label>
+                              <textarea class="form-control" id="dockerfile" name="dockerfile" placeholder="dockerfile"></textarea>
+                            </div>
+                            <div class="form-group">
+                              <label for="file" class="control-label">files:</label>
+                              <input type="file" id="file" name="files" multiple="multiple"/>
+                            </div>
+                          </form>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                          <button type="submit" class="btn btn-primary" data-loading-text="处理中..." th:onclick="add('确定新增镜像吗？','addForm')">确定</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>镜像名</th>
+                        <th>镜像ID</th>
+                        <th>镜像大小</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="image : ${images}">
+
+                        <td th:text="${image.getRepoTags()[0]}"></td>
+                        <td th:text="${image.getId()}"></td>
+                        <td th:text="${#numbers.formatDecimal(image.getVirtualSize().doubleValue()/1024/1024,0,2)} + 'MB'"></td>
+                        <td th:text="${#dates.format(image.created*1000,'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td>
+                          <div class="btn-group">
+                            <a class="btn btn-xs btn-default" href="#!" th:href="@{'/image/createctn?image=' + ${image.getRepoTags()[0]}}" title="新建容器" data-toggle="tooltip"><i class="mdi mdi-skip-next-circle-outline"></i></a>
+                            <a class="btn btn-xs btn-default" href="#!" th:href="@{'/image/delimage?id=' + ${image.getId()}}" title="删除" data-toggle="tooltip"><i class="mdi mdi-window-close"></i></a>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+
+              </div>
+              </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </main>
+    <!--End 页面主要内容-->
+  </div>
+</div>
+<div class="loading" id="loading">
+  <figure class="loading pic">
+    <div class="loading dot white"></div>
+    <div class="loading dot"></div>
+    <div class="loading dot"></div>
+    <div class="loading dot"></div>
+    <div class="loading dot"></div>
+  </figure>
+</div>
+<script type="text/javascript" src="js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" src="js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" src="js/perfect-scrollbar.min.js" th:src="@{/js/perfect-scrollbar.min.js}"></script>
+<script type="text/javascript" src="js/main.min.js" th:src="@{/js/main.min.js}"></script>
+<script type="text/javascript">
+  jQuery('.loading').hide();
+function add(mess,formid){
+  if(confirm(mess)){
+    var form = document.getElementById(formid);
+    form.submit();
+    jQuery('.loading').show();
+  }
+}
+</script>
+</body>
+</html>

@@ -1,10 +1,17 @@
 package com.example.edge_node.controller;
 
+import com.example.edge_node.pojo.SysMonitor;
+import com.example.edge_node.service.ContainerService;
+import com.example.edge_node.service.ImageService;
+import com.example.edge_node.service.MonitorService;
+import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.Image;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,21 +20,48 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.SocketException;
+import java.util.List;
 
 /**
  * Create by zhangran
  */
 @Controller
 public class BaseController {
+    @Autowired
+    MonitorService monitorService;
+    @Autowired
+    ImageService imageService;
+    @Autowired
+    ContainerService containerService;
+
     @RequestMapping({"/index","/"})
     public String toIndex(Model model){
-        return "index";
+        try {
+            SysMonitor sysInfo = monitorService.SystemMonitor();
+            model.addAttribute("sysInfo",sysInfo);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        return "nodewatch";
     }
 
-    @RequestMapping({"/list"})
-    public String toList(Model model){
-        return "list";
+    @RequestMapping({"/imageslist"})
+    public String toImagesList(Model model){
+        List<Image> images = imageService.list();
+        model.addAttribute("images",images);
+        return "Imageslist";
     }
+
+    @RequestMapping({"/ctnlist"})
+    public String toCtnList(Model model){
+        List<Container> containers = containerService.list();
+        model.addAttribute("containers",containers);
+        return "Containerslist";
+    }
+
+
 
 
     @RequestMapping("/toLogin")

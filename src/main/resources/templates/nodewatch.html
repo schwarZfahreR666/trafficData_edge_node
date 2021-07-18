@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="icon" href="favicon.ico" th:href="@{/favicon.ico}" type="image/ico">
+  <title>边缘节点管理系统</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+<link href="css/materialdesignicons.min.css" rel="stylesheet" th:href="@{/css/materialdesignicons.min.css}">
+<link href="css/style.min.css" rel="stylesheet" th:href="@{/css/style.min.css}">
+</head>
+
+<body data-theme="default" data-sidebarbg="color_8" data-headerbg="default" data-logobg="color_8">
+<div class="lyear-layout-web">
+  <div class="lyear-layout-container">
+<div th:insert="~{Nav :: #copy-nav}"></div>
+    <!--头部信息-->
+    <header class="lyear-layout-header" >
+
+      <nav class="navbar navbar-default">
+        <div class="topbar">
+
+          <div class="topbar-left">
+            <div class="lyear-aside-toggler">
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+              <span class="lyear-toggler-bar"></span>
+            </div>
+            <span class="navbar-page-title"> 节点监控 </span>
+          </div>
+
+
+
+        </div>
+      </nav>
+
+    </header>
+    <!--End 头部信息-->
+
+    <!--页面主要内容-->
+    <main class="lyear-layout-content">
+
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col-sm-6 col-lg-3">
+            <div class="card bg-primary">
+              <div class="card-body clearfix">
+                <div class="pull-right">
+                  <p class="h6 text-white m-t-0">服务器IP</p>
+                  <p class="h3 text-white m-b-0" th:text="${sysInfo.getComputerIp()}"></p>
+                </div>
+                <div class="pull-left"> <span class="img-avatar img-avatar-48 bg-translucent"><i class="mdi mdi-wan fa-1-5x"></i></span> </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="card bg-danger">
+              <div class="card-body clearfix">
+                <div class="pull-right">
+                  <p class="h6 text-white m-t-0">操作系统</p>
+                  <p class="h3 text-white m-b-0" th:text="${sysInfo.getOsName()}"></p>
+                </div>
+                <div class="pull-left"> <span class="img-avatar img-avatar-48 bg-translucent"><i class="mdi mdi-linux fa-1-5x"></i></span> </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="card bg-success">
+              <div class="card-body clearfix">
+                <div class="pull-right">
+                  <p class="h6 text-white m-t-0">系统架构</p>
+                  <p class="h3 text-white m-b-0" th:text="${sysInfo.getOsArch()}"></p>
+                </div>
+                <div class="pull-left"> <span class="img-avatar img-avatar-48 bg-translucent"><i class="mdi mdi-monitor fa-1-5x"></i></span> </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="card bg-purple">
+              <div class="card-body clearfix">
+                <div class="pull-right">
+                  <p class="h6 text-white m-t-0">CPU核心数</p>
+                  <p class="h3 text-white m-b-0" th:text="${sysInfo.getCpuNum()}"></p>
+                </div>
+                <div class="pull-left"> <span class="img-avatar img-avatar-48 bg-translucent"><i class="mdi mdi-chip fa-1-5x"></i></span> </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+
+
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header"><h4>容器监控</h4></div>
+              <div class="card-body">
+                <canvas id="containers-bar" width="400" height="180"></canvas>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header"><h4>CPU与内存</h4></div>
+              <div class="card-body">
+                <canvas id="cpu-pie" width="280" height="280" style="display: inline-flex"></canvas>
+                <canvas id="mem-pie" width="280" height="280" style="display: inline-flex"></canvas>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+    </main>
+    <!--End 页面主要内容-->
+  </div>
+</div>
+
+<script type="text/javascript" src="js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" src="js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" src="js/perfect-scrollbar.min.js" th:src="@{/js/perfect-scrollbar.min.js}"></script>
+<script type="text/javascript" src="js/main.min.js" th:src="@{/js/main.min.js}"></script>
+<script type="text/javascript" src="js/echarts.min.js" th:src="@{/js/echarts.min.js}"></script>
+
+<!--图表插件-->
+<script type="text/javascript" src="js/Chart.js" th:src="@{/js/Chart.js}"></script>
+<script type="text/javascript">
+  Chart.pluginService.register({
+    beforeDraw: function(chart) {
+      if (chart.config.options.elements.center) {
+        // Get ctx from string
+        var ctx = chart.chart.ctx;
+
+        // Get options from the center object in options
+        var centerConfig = chart.config.options.elements.center;
+        var fontStyle = centerConfig.fontStyle || 'Arial';
+        var txt = centerConfig.text;
+        var color = centerConfig.color || '#000';
+        var maxFontSize = centerConfig.maxFontSize || 75;
+        var sidePadding = centerConfig.sidePadding || 20;
+        var sidePaddingCalculated = (sidePadding / 100) * (chart.innerRadius * 2)
+        // Start with a base font of 30px
+        ctx.font = "30px " + fontStyle;
+
+        // Get the width of the string and also the width of the element minus 10 to give it 5px side padding
+        var stringWidth = ctx.measureText(txt).width;
+        var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
+
+        // Find out how much the font can grow in width.
+        var widthRatio = elementWidth / stringWidth;
+        var newFontSize = Math.floor(30 * widthRatio);
+        var elementHeight = (chart.innerRadius * 2);
+
+        // Pick a new font size so it will not be larger than the height of label.
+        var fontSizeToUse = Math.min(newFontSize, elementHeight, maxFontSize);
+        var minFontSize = centerConfig.minFontSize;
+        var lineHeight = centerConfig.lineHeight || 25;
+        var wrapText = false;
+
+        if (minFontSize === undefined) {
+          minFontSize = 20;
+        }
+
+        if (minFontSize && fontSizeToUse < minFontSize) {
+          fontSizeToUse = minFontSize;
+          wrapText = true;
+        }
+
+        // Set font settings to draw it correctly.
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        var centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+        var centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+        ctx.font = fontSizeToUse + "px " + fontStyle;
+        ctx.fillStyle = color;
+
+        if (!wrapText) {
+          ctx.fillText(txt, centerX, centerY);
+          return;
+        }
+
+        var words = txt.split(' ');
+        var line = '';
+        var lines = [];
+
+        // Break words up into multiple lines if necessary
+        for (var n = 0; n < words.length; n++) {
+          var testLine = line + words[n] + ' ';
+          var metrics = ctx.measureText(testLine);
+          var testWidth = metrics.width;
+          if (testWidth > elementWidth && n > 0) {
+            lines.push(line);
+            line = words[n] + ' ';
+          } else {
+            line = testLine;
+          }
+        }
+
+        // Move the center up depending on line height and number of lines
+        centerY -= (lines.length / 2) * lineHeight;
+
+        for (var n = 0; n < lines.length; n++) {
+          ctx.fillText(lines[n], centerX, centerY);
+          centerY += lineHeight;
+        }
+        //Draw text in center
+        ctx.fillText(line, centerX, centerY);
+      }
+    }
+  });
+
+
+    var $containers = jQuery( '#containers-bar' );
+
+    var $containersData = {
+      labels: ["总容器数目", "运行容器数目", "暂停容器数目", "停止容器数目", "镜像数目"],
+              datasets: [{
+        backgroundColor: "rgba(51,202,185,0.5)",
+        borderColor: "rgba(0,0,0,0)",
+        hoverBackgroundColor: "rgba(51,202,185,0.7)",
+        hoverBorderColor: "rgba(0,0,0,0)",
+        data: [0, 0, 0, 0, 0]
+      }]
+    };
+
+    var ContainersChart = new Chart($containers, {
+      type: 'horizontalBar',
+      data: $containersData,
+      options: {
+        legend: {
+          display: false
+        },
+        scaleShowGridLines : false,
+        scales: {
+          xAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      },
+    });
+    var $cpu = jQuery( '#cpu-pie' );
+    var $mem = jQuery( '#mem-pie' );
+
+    var $cpuData = {
+      labels: ["使用率", "等待率", "空闲率"],
+              datasets: [{
+      data: [0, 0, 100],
+      backgroundColor: ['rgba(255,99,132,1)', 'rgba(255, 206, 86, 1)','rgba(54, 162, 235, 1)']
+    }]
+    };
+
+    var cpuChart = new Chart($cpu, {
+      type: 'doughnut',
+      data: $cpuData,
+      options: {
+      responsive: false,
+        elements: {
+          center: {
+            text: 'CPU监控',
+            color: '#000000', // Default is #000000
+            fontStyle: 'Arial', // Default is Arial
+            sidePadding: 20, // Default is 20 (as a percentage)
+            minFontSize: 25, // Default is 20 (in px), set to false and text will not wrap.
+            lineHeight: 25 // Default is 25 (in px), used for when text wraps
+          }
+        }
+    },
+    });
+
+    var $memData = {
+      labels: ["使用率","空闲率"],
+      datasets: [{
+        data: [0,100],
+        backgroundColor: ['rgba(255,99,132,1)','rgba(54, 162, 235, 1)']
+      }]
+    };
+
+    var memChart = new Chart($mem, {
+      type: 'doughnut',
+      data: $memData,
+      options: {
+        responsive: false,
+        elements: {
+          center: {
+            text: '内存监控',
+            color: '#000000', // Default is #000000
+            fontStyle: 'Arial', // Default is Arial
+            sidePadding: 20, // Default is 20 (as a percentage)
+            minFontSize: 25, // Default is 20 (in px), set to false and text will not wrap.
+            lineHeight: 25 // Default is 25 (in px), used for when text wraps
+          }
+        }
+      }
+    });
+
+  function getHostInfo(){
+    $.ajax({
+      url: '/data/hostInfo',
+      type: 'get',
+      dataType: 'json',
+      success: function (data) {
+
+        ContainersChart.data.datasets[0].data = [data["containers"],data["containersRunning"],data["containersPaused"],data["containersStopped"],data["images"]];
+        ContainersChart.update();
+
+      }
+    })
+  }
+
+    function getSysInfo(){
+      $.ajax({
+        url: '/data/sysInfo',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+
+          cpuChart.data.datasets[0].data = [data["cpuUsed"],data["cpuWait"],data["cpuFree"]];
+          cpuChart.update();
+          memChart.data.datasets[0].data = [data["memUsage"],100-data["memUsage"]];
+          memChart.update();
+
+
+        }
+      })
+    }
+  setInterval(getHostInfo,10000);
+  setInterval(getSysInfo,10000);
+
+</script>
+</body>
+</html>

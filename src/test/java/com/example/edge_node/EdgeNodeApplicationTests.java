@@ -56,11 +56,19 @@ class EdgeNodeApplicationTests {
     @Test
     void testImage(){
         for (Image image : imageService.list()) {
+            System.out.println(image);
             InspectImageResponse inspectImageResponse = imageService.info(image.getId());
-            System.out.println(inspectImageResponse);
+
+            System.out.println(inspectImageResponse.getContainerConfig().getWorkingDir());
         }
+    }
 
+    @Test
+    void testContainers(){
+        for (Container container : containerService.list()) {
 
+            System.out.println(imageService.info(monitorService.inspectContainer(container.getId()).getImageId()).getContainerConfig().getWorkingDir());
+        }
     }
     @Test
     void testContainer() throws IOException, InterruptedException {
@@ -108,6 +116,8 @@ class EdgeNodeApplicationTests {
             e.printStackTrace();
         }
     }
+
+
 
 
 

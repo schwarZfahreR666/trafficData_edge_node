@@ -32,12 +32,12 @@ public class ShiroConfiguration {
         * */
         Map<String, String> filterMap = new LinkedHashMap<>();
 //        filterMap.put("/user/add","perms[user:add]");
-        filterMap.put("/login","anon");
-        filterMap.put("/css/*","anon");
-        filterMap.put("/js/*","anon");
-        filterMap.put("/images/*","anon");
-        filterMap.put("/favicon.ico","anon");
-        filterMap.put("/**","authc");
+//        filterMap.put("/login","anon");
+//        filterMap.put("/css/*","anon");
+//        filterMap.put("/js/*","anon");
+//        filterMap.put("/images/*","anon");
+//        filterMap.put("/favicon.ico","anon");
+//        filterMap.put("/**","authc");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterMap);
 

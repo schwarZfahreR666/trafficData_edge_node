@@ -31,6 +31,10 @@ public class FileService {
     @Value("${filepath}")
     private String filepath;
 
+    public String getFilepath(){
+        return filepath;
+    }
+
     public int saveFiles(MultipartFile[] files) {
 
         File targetFile = new File(filepath);
@@ -71,6 +75,24 @@ public class FileService {
         log.info("dockerfile存储成功！");
         return 0;
     }
+
+    public int saveInput(String content){
+
+        File targetFile = new File(filepath);
+        if (!targetFile.exists()) {
+            targetFile.mkdirs();
+        }
+        try (PrintStream out = new PrintStream(new FileOutputStream(filepath + "input.txt"))) {
+            out.print(content);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            log.error("input存储失败！");
+            return -1;
+        }
+        log.info("input存储成功！");
+        return 0;
+    }
+
 
     public void copyTarToContainer(String id,String filepath,String remotePath){
         DockerClient cli = dockerService.getDockerClient();
