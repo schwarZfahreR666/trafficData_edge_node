@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.edge_node.mapper.ImageMapper">
+    <select id="getImageByName" parameterType="string" resultType="com.example.edge_node.pojo.Image" >
+        select name,id
+        from task_table where name=#{name};
+    </select>
+    <select id="getImageById" parameterType="string" resultType="com.example.edge_node.pojo.Image" >
+        select name,id
+        from task_table where id=#{id};
+    </select>
+    <select id="getImages" resultType="com.example.edge_node.pojo.Image" >
+        select name,id
+        from task_table;
+    </select>
+
+    <insert id="saveImage" parameterType="com.example.edge_node.pojo.Image">
+        insert into task_table (name,id)
+        select #{name},#{id} from DUAL
+        where not exists (select name,id from task_table where name = #{name} and id=#{id});
+    </insert>
+
+    <delete id="delImage" parameterType="string">
+        delete FROM task_table where id=#{id};
+    </delete>
+</mapper>

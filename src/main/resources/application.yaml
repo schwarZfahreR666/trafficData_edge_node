@@ -50,6 +50,23 @@ spring:
     contentnegotiation:
       favor-parameter: true
 
+  kafka:
+    bootstrap-servers:
+      - 47.95.159.86:9092
+    producer:
+      topic: "edge-cloud"
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+    consumer:
+      group-id: cloud-edge-0
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 100
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 #  redis:
 #    host: 10.136.17.35
 #    port: 6379
@@ -68,8 +85,8 @@ mybatis:
 #  config-location: classpath:mybatis/mybatis-config.xml
 
 docker:
-  url: "tcp://192.168.0.7:2375"#"unix:///var/run/docker.sock"
-  restUrl: "https://192.168.0.7:2375"
+  url: "tcp://192.168.0.22:2375"#"unix:///var/run/docker.sock"
+  restUrl: "https://192.168.0.22:2375"
   #"tcp://192.168.0.18:2375"
   filepath: /Users/zhangran/Documents/cache/files
 #文件存储路径

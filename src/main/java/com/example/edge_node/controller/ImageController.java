@@ -1,5 +1,7 @@
 package com.example.edge_node.controller;
 
+import com.example.edge_node.mapper.ImageMapper;
+import com.example.edge_node.pojo.Image;
 import com.example.edge_node.service.ContainerService;
 import com.example.edge_node.service.FileService;
 import com.example.edge_node.service.ImageService;
@@ -31,6 +33,8 @@ public class ImageController {
     ContainerService containerService;
     @Autowired
     MonitorService monitorService;
+    @Autowired
+    ImageMapper imageMapper;
     @Value("${filepath}")
     String filepath;
 
@@ -42,6 +46,8 @@ public class ImageController {
         fileService.saveDockerfile(content);
         fileService.saveFiles(files);
         imageService.buildImage(tag);
+        String id = imageService.info(tag).getId();
+        imageMapper.saveImage(new Image(tag,id));
         log.info("镜像编译成功");
 
         return "redirect:/imageslist";
@@ -52,6 +58,7 @@ public class ImageController {
     @RequestMapping("/delimage")
     public String delImage(@RequestParam String id){
         imageService.delete(id);
+        imageMapper.delImage(id);
         log.info("镜像删除成功");
         return "redirect:/imageslist";
     }

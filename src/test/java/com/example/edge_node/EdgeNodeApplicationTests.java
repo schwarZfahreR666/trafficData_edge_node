@@ -1,5 +1,7 @@
 package com.example.edge_node;
 
+import com.example.edge_node.kafka.EdgeProducer;
+import com.example.edge_node.mapper.ImageMapper;
 import com.example.edge_node.service.*;
 import com.example.edge_node.utils.ZipUtils;
 import com.github.dockerjava.api.command.InspectImageResponse;
@@ -33,6 +35,10 @@ class EdgeNodeApplicationTests {
     MonitorService monitorService;
     @Autowired
     FileService fileService;
+    @Autowired
+    ImageMapper imageMapper;
+    @Autowired
+    EdgeProducer edgeProducer;
 
     @Test
     void contextLoads() {
@@ -117,6 +123,24 @@ class EdgeNodeApplicationTests {
         }
     }
 
+    @Test
+    void testImageMapper(){
+        com.example.edge_node.pojo.Image image = new com.example.edge_node.pojo.Image();
+        image.setId("1111111112222");
+        image.setName("1111");
+        imageMapper.saveImage(image);
+        System.out.println(imageMapper.getImageByName("1111"));
+//        imageMapper.delImage(image);
+        System.out.println(imageMapper.getImageByName("1111"));
+        System.out.println(imageMapper.getImages());
+    }
+
+    @Test
+    void kafkaProducer(){
+        for (int i = 0; i < 100; i++) {
+            edgeProducer.send("100www"+i);
+        }
+    }
 
 
 

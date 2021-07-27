@@ -69,9 +69,9 @@
                         <td th:text="${container.getStatus()}"></td>
                         <td>
                           <div class="btn-group">
-                            <a class="btn btn-xs btn-default" href="#!" title="启动容器" data-toggle="modal" data-target="#exampleModal"><i class="mdi mdi-skip-next"></i></a>
+                            <a class="btn btn-xs btn-default" href="#!" title="启动容器" data-toggle="modal" th:data-target="${'#' + container.getNames()[0].split('/')[1] }"><i class="mdi mdi-skip-next"></i></a>
 
-                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+                                <div class="modal fade" th:id="${ container.getNames()[0].split('/')[1] }" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
                                   <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                       <div class="modal-header">
@@ -79,7 +79,7 @@
                                         <h4 class="modal-title" id="exampleModalLabel">启动容器</h4>
                                       </div>
                                       <div class="modal-body">
-                                        <form enctype="multipart/form-data" id="startForm" th:method="post" th:action="@{/ctn/startctn}">
+                                        <form enctype="multipart/form-data" th:id="${ 'startForm' + container.getNames()[0].split('/')[1] }" th:method="post" th:action="@{/ctn/startctn}">
                                           <div class="form-group">
                                             <label for="id" class="control-label">id:</label>
                                             <input type="text" class="form-control" id="id" name="id" placeholder="id" th:value="${container.getId()}">
@@ -92,7 +92,7 @@
                                       </div>
                                       <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                        <button type="submit" class="btn btn-primary" data-loading-text="处理中..." th:onclick="add('确定启动容器吗？','startForm')">确定</button>
+                                        <button type="submit" class="btn btn-primary" data-loading-text="处理中..." th:onclick="add('确定启动容器吗?',[[${'startForm' + container.getNames()[0].split('/')[1]}]])">确定</button>
                                       </div>
                                     </div>
                                   </div>
