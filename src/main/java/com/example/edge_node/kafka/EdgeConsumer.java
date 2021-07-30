@@ -12,12 +12,12 @@ import java.util.Optional;
 /**
  * Create by zhangran
  */
-@Component
+//@Component
 @Slf4j
 public class EdgeConsumer {
-    @Autowired
-    EdgeProducer edgeProducer;
-    @KafkaListener(topics = {"cloud-edge"})
+//    @Autowired
+//    EdgeProducer edgeProducer;
+//    @KafkaListener(topics = {"cloud-edge"})
     public void consumer(ConsumerRecord<?,?> consumerRecord){
         //判断是否为null
         Optional<?> kafkaMessage = Optional.ofNullable(consumerRecord.value());
@@ -28,7 +28,7 @@ public class EdgeConsumer {
             JSONObject jsonObject = JSONObject.parseObject(message.toString());
 
             Status status = new Status(0,"启动任务成功");
-            edgeProducer.send(status);
+//            edgeProducer.send(status);
         }
     }
 }
