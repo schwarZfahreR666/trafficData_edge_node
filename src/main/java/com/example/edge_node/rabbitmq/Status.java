@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Status {
-    private int status;
+    private Integer status;
     private String info;
+    private String res;
 }

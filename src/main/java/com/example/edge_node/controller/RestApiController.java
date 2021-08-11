@@ -1,6 +1,7 @@
 package com.example.edge_node.controller;
 
 import com.example.edge_node.mapper.ImageMapper;
+import com.example.edge_node.pojo.HostInfo;
 import com.example.edge_node.pojo.Image;
 import com.example.edge_node.pojo.SysMonitor;
 import com.example.edge_node.service.MonitorService;
@@ -31,6 +32,12 @@ public class RestApiController {
             e.printStackTrace();
         }
         return sysMonitor;
+    }
+
+    @GetMapping("/hostInfo")
+    public HostInfo getHostInfo(){
+        HostInfo hostInfo = monitorService.getInfo();
+        return hostInfo;
     }
 
     @GetMapping("/tasks")

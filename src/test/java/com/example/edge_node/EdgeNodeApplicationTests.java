@@ -10,6 +10,7 @@ import com.github.dockerjava.api.model.Image;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +38,7 @@ class EdgeNodeApplicationTests {
     FileService fileService;
     @Autowired
     ImageMapper imageMapper;
-    @Autowired
-    EdgeProducer edgeProducer;
+
 
     @Test
     void contextLoads() {
@@ -135,11 +135,11 @@ class EdgeNodeApplicationTests {
         System.out.println(imageMapper.getImages());
     }
 
+
     @Test
-    void kafkaProducer(){
-        for (int i = 0; i < 100; i++) {
-            edgeProducer.send("100www"+i);
-        }
+    void eval() throws SocketException {
+
+        monitorService.evalHealth();
     }
 
 

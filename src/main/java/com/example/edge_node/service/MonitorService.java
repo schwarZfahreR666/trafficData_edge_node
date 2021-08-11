@@ -9,7 +9,9 @@ import com.example.edge_node.utils.IpUtil;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.HealthState;
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Info;
 import com.github.dockerjava.api.model.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ import oshi.util.Util;
 import oshi.hardware.CentralProcessor.TickType;
 
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -35,6 +39,8 @@ import java.util.Properties;
 public class MonitorService {
     @Autowired
     DockerService dockerService;
+    @Autowired
+    ContainerService containerService;
     @Value("${docker.restUrl}")
     private String url;
     /*获取单个container信息*/
@@ -44,7 +50,7 @@ public class MonitorService {
         String containerID = id;
 
         RestTemplate restTemplate =  new RestTemplate();
-        statistics = restTemplate.getForObject(url.replace("tcp","http") + "/containers/"+containerID+"/stats?stream=0", String.class);
+        statistics = restTemplate.getForObject(url + "/containers/"+containerID+"/stats?stream=0", String.class);
         JSONObject jsonObject =  JSONObject.parseObject(statistics);
         float used_memory = (jsonObject.getJSONObject("memory_stats").getFloat("usage") - jsonObject.getJSONObject("memory_stats").getJSONObject("stats").getFloat("cache")) / 1024;
         float available_memory = jsonObject.getJSONObject("memory_stats").getFloat("limit") / 1024;
@@ -73,7 +79,7 @@ public class MonitorService {
         String containerID = id;
 
         RestTemplate restTemplate =  new RestTemplate();
-        statistics = restTemplate.getForObject(url.replace("tcp","http") + "/containers/"+containerID+"/json", String.class);
+        statistics = restTemplate.getForObject(url + "/containers/"+containerID+"/json", String.class);
 
         JSONObject jsonObject =  JSONObject.parseObject(statistics);
         String running = jsonObject.getJSONObject("State").getString("Running");
@@ -171,6 +177,42 @@ public class MonitorService {
 
         return sys;
 
+    }
+
+
+    public void evalHealth() throws SocketException {
+        SysMonitor sysMonitor = SystemMonitor();
+        HostInfo hostInfo = getInfo();
+        List<Container> ctns = containerService.list();
+        List<String> inspects = new ArrayList<>();
+        List<InspectContainerResponse> inspectResponses = new ArrayList<>();
+        List<Status> statuses = new ArrayList<>();
+        for (Container ctn : ctns) {
+            String id = ctn.getId();
+
+            InspectContainerResponse inspectContainerResponse = inspectContainer(id);
+            inspectResponses.add(inspectContainerResponse);
+            String status = inspectContainerResponse.getState().getStatus();
+            if("running".equals(status)){
+                inspects.add(getInspect(id));
+                statuses.add(getStats(id));
+            }
+
+        }
+
+
+//        System.out.println(sysMonitor);
+//        System.out.println(hostInfo);
+//        System.out.println(inspects);
+//        System.out.println(inspectResponses);
+//        System.out.println(statuses);
+        for (InspectContainerResponse inspectRespons : inspectResponses) {
+            HealthState healthState = inspectRespons.getState().getHealth();
+            if(healthState != null){
+                System.out.println(healthState.getStatus());
+            }
+
+        }
     }
 
 }

@@ -65,7 +65,7 @@
 
                         <td th:text="${container.getNames()[0]}"></td>
                         <td th:text="${container.getImage()}"></td>
-                        <td th:text="${#dates.format(container.getCreated()*1000,'yyyy-MM-dd HH:mm:ss')} + 'MB'"></td>
+                        <td th:text="${#dates.format(container.getCreated()*1000,'yyyy-MM-dd HH:mm:ss')}"></td>
                         <td th:text="${container.getStatus()}"></td>
                         <td>
                           <div class="btn-group">
@@ -136,6 +136,7 @@
                               </div>
                             </div>
 
+                            <a class="btn btn-xs btn-default" href="#!" th:href="@{'/ctn/stopctn?id=' + ${container.getId()}}" title="停止" data-toggle="tooltip"><i class="mdi mdi-stop-circle"></i></a>
                             <a class="btn btn-xs btn-default" href="#!" th:href="@{'/ctn/delctn?id=' + ${container.getId()}}" title="删除" data-toggle="tooltip"><i class="mdi mdi-window-close"></i></a>
                           </div>
                         </td>

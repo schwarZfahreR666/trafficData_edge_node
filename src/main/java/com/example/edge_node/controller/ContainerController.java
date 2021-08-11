@@ -39,6 +39,16 @@ public class ContainerController {
         return "redirect:/ctnlist";
     }
 
+    /*
+    * 停止容器
+    * */
+    @RequestMapping("/stopctn")
+    public String stopCtn(@RequestParam String id){
+        containerService.stop(id);
+        log.info("容器停止成功");
+        return "redirect:/ctnlist";
+    }
+
     /**
      * 启动容器
      */

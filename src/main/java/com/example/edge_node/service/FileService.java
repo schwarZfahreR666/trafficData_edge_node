@@ -40,6 +40,9 @@ public class FileService {
         File targetFile = new File(filepath);
         if (!targetFile.exists()) {
             targetFile.mkdirs();
+        }else{
+            targetFile.delete();
+            targetFile.mkdirs();
         }
         for (MultipartFile file : files) {
             try (FileOutputStream out = new FileOutputStream(filepath + file.getOriginalFilename());) {

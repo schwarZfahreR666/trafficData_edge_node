@@ -9,7 +9,7 @@ spring:
       #      最大支持请求大小
       max-request-size: 100MB
   datasource:
-    url: jdbc:mysql://localhost/edge_node
+    url: jdbc:mysql://47.95.159.86/edge_node
     username: root
     password: '06240118'
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -89,8 +89,8 @@ mybatis:
 #  config-location: classpath:mybatis/mybatis-config.xml
 
 docker:
-  url: "tcp://192.168.0.22:2375"#"unix:///var/run/docker.sock"
-  restUrl: "https://192.168.0.22:2375"
+  url: "tcp://192.168.2.201:2375"#"unix:///var/run/docker.sock"
+  restUrl: "http://192.168.2.201:2375"
   #"tcp://192.168.0.18:2375"
   filepath: /Users/zhangran/Documents/cache/files
 #文件存储路径
