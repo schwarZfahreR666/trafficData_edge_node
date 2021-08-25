@@ -44,4 +44,15 @@ public class RestApiController {
     public List<Image> getTasks(){
         return imageMapper.getImages();
     }
+
+    @GetMapping("/health")
+    public String gethealth(){
+        String health = "获取节点健康状况失败。";
+        try {
+             health = monitorService.evalHealth();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return health;
+    }
 }

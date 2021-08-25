@@ -89,8 +89,8 @@ mybatis:
 #  config-location: classpath:mybatis/mybatis-config.xml
 
 docker:
-  url: "tcp://192.168.2.201:2375"#"unix:///var/run/docker.sock"
-  restUrl: "http://192.168.2.201:2375"
+  url: "tcp://192.168.43.201:2375"#"unix:///var/run/docker.sock"
+  restUrl: "http://192.168.43.201:2375"
   #"tcp://192.168.0.18:2375"
   filepath: /Users/zhangran/Documents/cache/files
 #文件存储路径
@@ -101,3 +101,4 @@ logging:
     name: /Users/zhangran/Documents/cache/logger.log
   level:
     root: info
+

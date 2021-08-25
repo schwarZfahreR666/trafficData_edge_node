@@ -1,27 +1,29 @@
 package com.example.edge_node;
 
-import com.example.edge_node.kafka.EdgeProducer;
+import com.example.edge_node.config.Neo4jConfig;
 import com.example.edge_node.mapper.ImageMapper;
+import com.example.edge_node.neo4j.BaseService;
 import com.example.edge_node.service.*;
 import com.example.edge_node.utils.ZipUtils;
 import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Image;
 import org.junit.jupiter.api.Test;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.neo4j.driver.Values.parameters;
 
 @SpringBootTest
 class EdgeNodeApplicationTests {
@@ -139,7 +141,39 @@ class EdgeNodeApplicationTests {
     @Test
     void eval() throws SocketException {
 
-        monitorService.evalHealth();
+        System.out.println(monitorService.evalHealth());
+    }
+
+
+    @Test
+    void testNeo4j(){
+
+        Session session = BaseService.DATASOURCE.getSession();
+        Result result = session.run( "MATCH (c:node)-[:to]->(s:node) where c.name=$stop_name and c.lower_bound<=$stop_var and c.upper_bound>$stop_var return s.var as score" +
+                        " UNION ALL " +
+                        "MATCH (c:node)-[:to]->(s:node) where c.name=$sys_name and c.lower_bound<=$sys_var and c.upper_bound>$sys_var return s.var as score" +
+                        " UNION ALL " +
+                        "MATCH (c:node)-[:to]->(s:node) where c.name=$mem_name and c.lower_bound<=$mem_var and c.upper_bound>$mem_var return s.var as score" +
+                        " UNION ALL " +
+                        "MATCH (c:node)-[:to]->(s:node) where c.name=$use_name and c.lower_bound<=$use_var and c.upper_bound>$use_var return s.var as score" +
+                        " UNION ALL " +
+                        "MATCH (c:node)-[:to]->(s:node) where c.name=$wait_name and c.lower_bound<=$wait_var and c.upper_bound>$wait_var return s.var as score",
+                parameters(
+                        "stop_name", "containersStopped" ,"stop_var",1,
+                        "sys_name","cpuSys","sys_var",19.5,
+                        "mem_name","MemUsage","mem_var",20.1,
+                        "use_name","cpuUsed","use_var",22.3,
+                        "wait_name","cpuWait","wait_var",26.5
+                ) );
+
+
+
+
+
+        System.out.println(result.list());
+
+        BaseService.DATASOURCE.close();
+
     }
 
 
