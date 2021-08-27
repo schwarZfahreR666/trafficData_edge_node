@@ -43,8 +43,9 @@ public class ImageController {
      */
     @PostMapping(value = "/build")
     public String uploading(@RequestParam("files") MultipartFile[] files,@RequestParam("dockerfile") String content,@RequestParam("tag") String tag) throws Exception {
-        fileService.saveDockerfile(content);
+
         fileService.saveFiles(files);
+        fileService.saveDockerfile(content);
         imageService.buildImage(tag);
         String id = imageService.info(tag).getId();
         imageMapper.saveImage(new Image(tag,id));

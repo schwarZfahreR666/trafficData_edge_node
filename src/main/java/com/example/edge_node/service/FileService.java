@@ -41,7 +41,9 @@ public class FileService {
         if (!targetFile.exists()) {
             targetFile.mkdirs();
         }else{
-            targetFile.delete();
+
+            delDir(filepath);
+
             targetFile.mkdirs();
         }
         for (MultipartFile file : files) {
@@ -216,5 +218,22 @@ public class FileService {
         }
         tis.close();
         return res;
+    }
+
+    public void delDir(String path){
+        File targetFile = new File(path);
+        if(targetFile.exists()){
+            File[] tmp = targetFile.listFiles();
+
+            for(int i=0;i<tmp.length;i++){
+                if(tmp[i].isDirectory()){
+                    delDir(path + "/" + tmp[i].getName());
+                }
+                else{
+                    tmp[i].delete();
+                }
+            }
+            targetFile.delete();
+        }
     }
 }

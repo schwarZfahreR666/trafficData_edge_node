@@ -21,6 +21,15 @@ public class RabbitConfig {
     public FanoutExchange cloud_edgeExchange(){
         return new FanoutExchange("cloud-edge",true,false);
     }
+
+    @Bean
+    public FanoutExchange auto_edge_cloudExchange(){
+        return new FanoutExchange("auto-edge-cloud",true,false);
+    }
+    @Bean
+    public FanoutExchange auto_cloud_edgeExchange(){
+        return new FanoutExchange("auto-cloud-edge",true,false);
+    }
     //2.创建队列
     @Bean
     public Queue edge_cloudQueue(){
@@ -30,6 +39,15 @@ public class RabbitConfig {
     public Queue cloud_edgeQueue(){
         return new Queue("cloud-edge-queue");
     }
+
+    @Bean
+    public Queue auto_edge_cloudQueue(){
+        return new Queue("auto-edge-cloud-queue");
+    }
+    @Bean
+    public Queue auto_cloud_edgeQueue(){
+        return new Queue("auto-cloud-edge-queue");
+    }
     //3.绑定关系
     @Bean
     public Binding edge_cloudBinding(){
@@ -38,6 +56,15 @@ public class RabbitConfig {
     @Bean
     public Binding cloud_edgeBinding(){
         return BindingBuilder.bind(cloud_edgeQueue()).to(cloud_edgeExchange());
+    }
+
+    @Bean
+    public Binding auto_edge_cloudBinding(){
+        return BindingBuilder.bind(auto_edge_cloudQueue()).to(auto_edge_cloudExchange());
+    }
+    @Bean
+    public Binding auto_cloud_edgeBinding(){
+        return BindingBuilder.bind(auto_cloud_edgeQueue()).to(auto_cloud_edgeExchange());
     }
 
 
