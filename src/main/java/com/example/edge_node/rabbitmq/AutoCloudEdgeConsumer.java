@@ -22,14 +22,17 @@ public class AutoCloudEdgeConsumer {
     public void reviceMessage(String message){
         JSONObject jsonObject =  JSONObject.parseObject(message);
         log.info(">>>>>>>>>> record =" + jsonObject.toJSONString());
-        String taskName = jsonObject.getString("name");
+        String taskName = jsonObject.getString("task_name");
         String input = "";
-        String time = jsonObject.getString("time");
+        String nodeName = jsonObject.getString("node_name");
         String res = "no";
-        String ans = taskService.startTask(taskName,input,res);
-//        Status status = new Status(0,"启动任务成功",ans);
-//        String exchangeName = "edge-cloud";
-//        String routingKey = "";
-//        edgeCloudProducer.send(exchangeName,routingKey,status);
+        if("BUAA".equals(nodeName)){
+                    String ans = taskService.startTask(taskName,input,res);
+        }
+
+        Status status = new Status(0,"启动任务成功",taskName);
+        String exchangeName = "auto-edge-cloud";
+        String routingKey = "";
+        edgeCloudProducer.send(exchangeName,routingKey,status);
     }
 }
