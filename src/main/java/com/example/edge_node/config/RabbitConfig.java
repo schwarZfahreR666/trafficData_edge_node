@@ -14,6 +14,15 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
     //1.创建交换机
     @Bean
+    public FanoutExchange edge_sendExchange(){
+        return new FanoutExchange("edge-send",true,false);
+    }
+    @Bean
+    public FanoutExchange cloud_sendExchange(){
+        return new FanoutExchange("cloud-send",true,false);
+    }
+
+    @Bean
     public FanoutExchange edge_cloudExchange(){
         return new FanoutExchange("edge-cloud",true,false);
     }
@@ -32,6 +41,15 @@ public class RabbitConfig {
     }
     //2.创建队列
     @Bean
+    public Queue edge_sendQueue(){
+        return new Queue("edge-send-queue");
+    }
+    @Bean
+    public Queue cloud_sendQueue(){
+        return new Queue("cloud-send-queue");
+    }
+
+    @Bean
     public Queue edge_cloudQueue(){
         return new Queue("edge-cloud-queue");
     }
@@ -49,6 +67,15 @@ public class RabbitConfig {
         return new Queue("auto-cloud-edge-queue");
     }
     //3.绑定关系
+    @Bean
+    public Binding edge_sendBinding(){
+        return BindingBuilder.bind(edge_sendQueue()).to(edge_sendExchange());
+    }
+    @Bean
+    public Binding cloud_sendBinding(){
+        return BindingBuilder.bind(cloud_sendQueue()).to(cloud_sendExchange());
+    }
+
     @Bean
     public Binding edge_cloudBinding(){
         return BindingBuilder.bind(edge_cloudQueue()).to(edge_cloudExchange());
