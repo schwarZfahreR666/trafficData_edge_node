@@ -1,9 +1,7 @@
 package com.example.edge_node.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,59 +10,61 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class RabbitConfig {
+    @Value("${server.nodeName}")
+    String nodeName;
     //1.创建交换机
     @Bean
     public FanoutExchange edge_sendExchange(){
-        return new FanoutExchange("edge-send",true,false);
+        return new FanoutExchange("edge-send-" + nodeName,true,false);
     }
     @Bean
-    public FanoutExchange cloud_sendExchange(){
-        return new FanoutExchange("cloud-send",true,false);
+    public DirectExchange cloud_sendExchange(){
+        return new DirectExchange("cloud-send",true,false);
     }
 
     @Bean
     public FanoutExchange edge_cloudExchange(){
-        return new FanoutExchange("edge-cloud",true,false);
+        return new FanoutExchange("edge-cloud-" + nodeName,true,false);
     }
     @Bean
-    public FanoutExchange cloud_edgeExchange(){
-        return new FanoutExchange("cloud-edge",true,false);
+    public DirectExchange cloud_edgeExchange(){
+        return new DirectExchange("cloud-edge",true,false);
     }
 
     @Bean
     public FanoutExchange auto_edge_cloudExchange(){
-        return new FanoutExchange("auto-edge-cloud",true,false);
+        return new FanoutExchange("auto-edge-cloud-" + nodeName,true,false);
     }
     @Bean
-    public FanoutExchange auto_cloud_edgeExchange(){
-        return new FanoutExchange("auto-cloud-edge",true,false);
+    public DirectExchange auto_cloud_edgeExchange(){
+        return new DirectExchange("auto-cloud-edge",true,false);
     }
     //2.创建队列
     @Bean
     public Queue edge_sendQueue(){
-        return new Queue("edge-send-queue");
+        return new Queue("edge-send-queue-" + nodeName);
     }
     @Bean
     public Queue cloud_sendQueue(){
-        return new Queue("cloud-send-queue");
+        return new Queue("cloud-send-queue-" + nodeName);
     }
 
     @Bean
     public Queue edge_cloudQueue(){
-        return new Queue("edge-cloud-queue");
+        return new Queue("edge-cloud-queue-" + nodeName);
     }
     @Bean
     public Queue cloud_edgeQueue(){
-        return new Queue("cloud-edge-queue");
+        return new Queue("cloud-edge-queue-" + nodeName);
     }
 
     @Bean
     public Queue auto_edge_cloudQueue(){
-        return new Queue("auto-edge-cloud-queue");
+        return new Queue("auto-edge-cloud-queue-" + nodeName);
     }
     @Bean
     public Queue auto_cloud_edgeQueue(){
-        return new Queue("auto-cloud-edge-queue");
+        return new Queue("auto-cloud-edge-queue-" + nodeName);
     }
     //3.绑定关系
     @Bean
@@ -73,7 +73,7 @@ public class RabbitConfig {
     }
     @Bean
     public Binding cloud_sendBinding(){
-        return BindingBuilder.bind(cloud_sendQueue()).to(cloud_sendExchange());
+        return BindingBuilder.bind(cloud_sendQueue()).to(cloud_sendExchange()).with(nodeName);
     }
 
     @Bean
@@ -82,7 +82,7 @@ public class RabbitConfig {
     }
     @Bean
     public Binding cloud_edgeBinding(){
-        return BindingBuilder.bind(cloud_edgeQueue()).to(cloud_edgeExchange());
+        return BindingBuilder.bind(cloud_edgeQueue()).to(cloud_edgeExchange()).with(nodeName);
     }
 
     @Bean
@@ -91,7 +91,7 @@ public class RabbitConfig {
     }
     @Bean
     public Binding auto_cloud_edgeBinding(){
-        return BindingBuilder.bind(auto_cloud_edgeQueue()).to(auto_cloud_edgeExchange());
+        return BindingBuilder.bind(auto_cloud_edgeQueue()).to(auto_cloud_edgeExchange()).with(nodeName);
     }
 
 

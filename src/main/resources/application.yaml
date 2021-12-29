@@ -1,5 +1,7 @@
 server:
+  nodeName: BUAA
   port: 9999
+  NodeInfoPath: /static/data/resource-topo.json
 spring:
   servlet:
     multipart:
@@ -82,6 +84,13 @@ spring:
     mode: HTML5
     suffix: .html
     prefix: classpath:/templates/
+
+zookeeper:
+  sleepTime:  1000
+  maxRetries: 3
+  host: 47.95.159.86
+  port: 2181
+
 
 mybatis:
   # 配 置 扫 描

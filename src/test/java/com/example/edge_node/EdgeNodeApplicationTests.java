@@ -3,8 +3,11 @@ package com.example.edge_node;
 import com.example.edge_node.config.Neo4jConfig;
 import com.example.edge_node.mapper.ImageMapper;
 import com.example.edge_node.neo4j.BaseService;
+import com.example.edge_node.pojo.NodeInfo;
 import com.example.edge_node.service.*;
+import com.example.edge_node.utils.JSONReader;
 import com.example.edge_node.utils.ZipUtils;
+import com.example.edge_node.zookeeper.CuratorUtils;
 import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Image;
@@ -40,6 +43,10 @@ class EdgeNodeApplicationTests {
     FileService fileService;
     @Autowired
     ImageMapper imageMapper;
+    @Autowired
+    CuratorUtils curatorUtils;
+    @Autowired
+    RegisterService registerService;
 
 
     @Test
@@ -174,6 +181,32 @@ class EdgeNodeApplicationTests {
 
         BaseService.DATASOURCE.close();
 
+    }
+
+
+    @Test
+    public void testZk() throws Exception {
+        curatorUtils.clear("/EdgeCloud/YANQING");
+//        List<com.example.edge_node.pojo.Image> images = imageMapper.getImages();
+//        for (com.example.edge_node.pojo.Image image : images) {
+//            curatorUtils.registeImage(image);
+//        }
+//
+//        List<String> res = curatorUtils.getChildrenNodes("/EdgeCloud/BUAA/images");
+//        for (String name : res) {
+//            System.out.println(curatorUtils.getNodeData("/EdgeCloud/BUAA/images/" + name));
+//        }
+//
+//        curatorUtils.clearRegistry();
+//        res = curatorUtils.getChildrenNodes("/EdgeCloud/BUAA/images");
+//        for (String name : res) {
+//            System.out.println(name);
+//        }
+
+    }
+    @Test
+    public void registeInfo(){
+        registerService.registeAllTask();
     }
 
 

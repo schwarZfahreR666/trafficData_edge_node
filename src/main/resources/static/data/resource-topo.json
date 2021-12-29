@@ -1,0 +1,38 @@
+{
+      "id": 12,
+      "name": "BUAA",
+      "type": "node",
+      "url": "/bh_edge/",
+      "img": "beihang-png.png",
+      "info": "BUAA节点是部署在北航的边缘节点，主要负责数据的采集和融合工作。",
+      "children": [
+        {
+          "id": 25,
+          "name": "路况预测",
+          "type": "app",
+          "children": [
+            {
+              "type": "data",
+              "name": "北京市路况数据",
+              "id": 15
+            }]
+        },
+        {
+          "id": 23,
+          "name": "客流集散模式计算",
+          "type": "app"
+        },
+        {
+          "id": 17,
+          "name": "事件采集",
+          "type": "app",
+          "children": [
+            {
+              "type": "data",
+              "name": "北京市交通事件",
+              "id": 11
+            }
+          ]
+        }
+      ]
+}
