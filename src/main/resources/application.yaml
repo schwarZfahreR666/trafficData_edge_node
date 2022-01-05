@@ -10,6 +10,13 @@ spring:
       max-file-size: 100MB
       #      最大支持请求大小
       max-request-size: 100MB
+
+  redis:
+    host: 47.95.159.86
+    port: 6379
+    password: "06240118"
+
+
   datasource:
     url: jdbc:mysql://47.95.159.86/edge_node
     username: root

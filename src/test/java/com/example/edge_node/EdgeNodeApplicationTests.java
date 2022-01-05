@@ -1,22 +1,20 @@
 package com.example.edge_node;
 
-import com.example.edge_node.config.Neo4jConfig;
 import com.example.edge_node.mapper.ImageMapper;
 import com.example.edge_node.neo4j.BaseService;
-import com.example.edge_node.pojo.NodeInfo;
 import com.example.edge_node.service.*;
-import com.example.edge_node.utils.JSONReader;
+import com.example.edge_node.utils.Base64ImageUtils;
 import com.example.edge_node.utils.ZipUtils;
 import com.example.edge_node.zookeeper.CuratorUtils;
 import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Image;
 import org.junit.jupiter.api.Test;
-import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -47,6 +45,8 @@ class EdgeNodeApplicationTests {
     CuratorUtils curatorUtils;
     @Autowired
     RegisterService registerService;
+    @Autowired
+    RedisTemplate defaultRedisTemplate;
 
 
     @Test
@@ -207,6 +207,21 @@ class EdgeNodeApplicationTests {
     @Test
     public void registeInfo(){
         registerService.registeAllTask();
+    }
+
+    @Test
+    public void testRedis(){
+        String encoderStr = Base64ImageUtils.encodeImgageToBase64("/static/data/beihang.jpg");
+
+        defaultRedisTemplate.opsForValue().set("beihang.jpg",encoderStr);
+
+        String ans = (String) defaultRedisTemplate.opsForValue().get("beihang.jpg");
+
+        Base64ImageUtils.decodeBase64ToImage(ans,"./","cache.png");
+
+        System.out.println(encoderStr.equals(ans));
+
+
     }
 
 

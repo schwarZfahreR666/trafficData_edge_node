@@ -3,11 +3,13 @@ package com.example.edge_node.service;
 import com.example.edge_node.mapper.ImageMapper;
 import com.example.edge_node.pojo.Image;
 import com.example.edge_node.pojo.NodeInfo;
+import com.example.edge_node.utils.Base64ImageUtils;
 import com.example.edge_node.utils.JSONReader;
 import com.example.edge_node.zookeeper.CuratorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,8 @@ public class RegisterService {
     CuratorUtils curatorUtils;
     @Autowired
     ImageMapper imageMapper;
+    @Autowired
+    RedisTemplate defaultRedisTemplate;
     @Value("${server.NodeInfoPath}")
     String path;
 
@@ -34,6 +38,12 @@ public class RegisterService {
         }
 
         registeNodeInfo();
+    }
+
+    public void imgRegiste(String imgName){
+        String encoderStr = Base64ImageUtils.encodeImgageToBase64("/static/data/" + imgName);
+
+        defaultRedisTemplate.opsForValue().set(imgName,encoderStr);
     }
 
     public void registeNodeInfo(){
@@ -49,6 +59,7 @@ public class RegisterService {
         curatorUtils.registeInfo(parentPath  + "type",nodeinfo.getType());
         curatorUtils.registeInfo(parentPath  + "url",nodeinfo.getUrl());
         curatorUtils.registeInfo(parentPath  + "img",nodeinfo.getImg());
+        if(nodeinfo.getImg() != null) imgRegiste(nodeinfo.getImg());
         curatorUtils.registeInfo(parentPath  + "info",nodeinfo.getInfo());
         List<NodeInfo> children = nodeinfo.getChildren();
         if(children != null ){
@@ -59,4 +70,6 @@ public class RegisterService {
             }
         }
     }
+
+
 }

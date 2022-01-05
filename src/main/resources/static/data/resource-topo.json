@@ -3,7 +3,7 @@
       "name": "BUAA",
       "type": "node",
       "url": "/bh_edge/",
-      "img": "beihang-png.png",
+      "img": "beihang.jpg",
       "info": "BUAA节点是部署在北航的边缘节点，主要负责数据的采集和融合工作。",
       "children": [
         {
