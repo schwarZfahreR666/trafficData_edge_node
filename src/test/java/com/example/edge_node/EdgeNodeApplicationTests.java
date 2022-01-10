@@ -4,6 +4,7 @@ import com.example.edge_node.mapper.ImageMapper;
 import com.example.edge_node.neo4j.BaseService;
 import com.example.edge_node.service.*;
 import com.example.edge_node.utils.Base64ImageUtils;
+import com.example.edge_node.utils.NetUtils;
 import com.example.edge_node.utils.ZipUtils;
 import com.example.edge_node.zookeeper.CuratorUtils;
 import com.github.dockerjava.api.command.InspectImageResponse;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,6 +49,8 @@ class EdgeNodeApplicationTests {
     RegisterService registerService;
     @Autowired
     RedisTemplate defaultRedisTemplate;
+    @Autowired
+    OfflineService offlineService;
 
 
     @Test
@@ -222,6 +226,14 @@ class EdgeNodeApplicationTests {
         System.out.println(encoderStr.equals(ans));
 
 
+    }
+    @Test
+    public void testOffline() throws InterruptedException {
+        System.out.println(NetUtils.isConnect("47.95.159.86"));
+        offlineService.putTask("1111",5);
+        offlineService.putTask("222",5);
+        offlineService.putTask("333",5);
+        offlineService.scheduleTask();
     }
 
 
