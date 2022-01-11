@@ -1,5 +1,6 @@
 package com.example.edge_node;
 
+import com.example.edge_node.cluster.dto.Message;
 import com.example.edge_node.mapper.ImageMapper;
 import com.example.edge_node.neo4j.BaseService;
 import com.example.edge_node.service.*;
@@ -51,6 +52,10 @@ class EdgeNodeApplicationTests {
     RedisTemplate defaultRedisTemplate;
     @Autowired
     OfflineService offlineService;
+    @Autowired
+    SlaveService slaveService;
+    @Autowired
+    MasterService masterService;
 
 
     @Test
@@ -234,6 +239,13 @@ class EdgeNodeApplicationTests {
         offlineService.putTask("222",5);
         offlineService.putTask("333",5);
         offlineService.scheduleTask();
+    }
+
+    @Test
+    public void testCluster(){
+        slaveService.sendHealth();
+        Message message = Message.builder().taskName("road_info").build();
+        masterService.sendMessage2slave("123",message);
     }
 
 

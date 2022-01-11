@@ -1,5 +1,6 @@
 package com.example.edge_node.service;
 
+import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.mapper.ImageMapper;
 import com.example.edge_node.pojo.Image;
 import com.example.edge_node.pojo.NodeInfo;
@@ -9,6 +10,7 @@ import com.example.edge_node.zookeeper.CuratorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.List;
 /**
  * Create by zhangran
  */
+@Conditional(MasterCondition.class)
 @Service
 @Slf4j
 public class RegisterService {

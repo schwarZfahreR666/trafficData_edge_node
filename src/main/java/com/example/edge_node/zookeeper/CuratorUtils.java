@@ -1,5 +1,6 @@
 package com.example.edge_node.zookeeper;
 
+import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.pojo.Image;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
@@ -8,6 +9,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
@@ -21,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Create by zhangran
  */
+@Conditional(MasterCondition.class)
 @Component
 @Slf4j
 public class CuratorUtils {

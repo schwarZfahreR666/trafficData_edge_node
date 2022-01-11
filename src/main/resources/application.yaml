@@ -1,4 +1,7 @@
 server:
+  master: "127.0.0.1"
+  master_port: 8888
+  slave_id: 123
   nodeName: BUAA
   port: 9999
   NodeInfoPath: /static/data/resource-topo.json

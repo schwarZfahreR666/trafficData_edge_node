@@ -2,12 +2,14 @@ package com.example.edge_node.rabbitmq;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.edge_node.config.ConstantValue;
+import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -15,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Create by zhangran
  */
+@Conditional(MasterCondition.class)
 @Service
 @Slf4j
 public class CloudEdgeConsumer {

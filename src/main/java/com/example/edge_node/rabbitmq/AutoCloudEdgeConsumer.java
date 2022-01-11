@@ -2,6 +2,7 @@ package com.example.edge_node.rabbitmq;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.edge_node.config.ConstantValue;
+import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.service.OfflineService;
 import com.example.edge_node.service.TaskService;
 import com.rabbitmq.client.Channel;
@@ -11,6 +12,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.io.IOException;
 /**
  * Create by zhangran
  */
+@Conditional(MasterCondition.class)
 @Service
 @Slf4j
 public class AutoCloudEdgeConsumer {

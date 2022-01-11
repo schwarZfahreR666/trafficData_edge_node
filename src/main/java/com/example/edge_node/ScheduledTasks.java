@@ -1,11 +1,13 @@
 package com.example.edge_node;
 
+import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.service.OfflineService;
 import com.example.edge_node.service.RegisterService;
 import com.example.edge_node.utils.NetUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,7 @@ import java.util.Date;
 /**
  * Create by zhangran
  */
+@Conditional(MasterCondition.class)
 @Component
 @Slf4j
 public class ScheduledTasks {
