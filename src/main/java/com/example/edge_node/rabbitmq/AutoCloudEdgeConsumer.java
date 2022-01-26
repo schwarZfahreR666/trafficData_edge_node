@@ -1,8 +1,10 @@
 package com.example.edge_node.rabbitmq;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.edge_node.cluster.dto.Message;
 import com.example.edge_node.config.ConstantValue;
 import com.example.edge_node.config.MasterCondition;
+import com.example.edge_node.service.MasterService;
 import com.example.edge_node.service.OfflineService;
 import com.example.edge_node.service.TaskService;
 import com.rabbitmq.client.Channel;
@@ -31,6 +33,8 @@ public class AutoCloudEdgeConsumer {
     TaskService taskService;
     @Autowired
     OfflineService offlineService;
+    @Autowired
+    MasterService masterService;
     @Value("${server.nodeName}")
     String NODE_NAME;
     @RabbitListener(queues = {"auto-cloud-edge-queue-" + ConstantValue.NODE_NAME})
@@ -43,7 +47,11 @@ public class AutoCloudEdgeConsumer {
         String res = "no";
         Status status = new Status(-1,"启动任务失败",taskName);
         if(NODE_NAME.equals(nodeName)){
-            String ans = taskService.startTask(taskName,input,res);
+            Message msg = Message.builder().taskName(taskName).build();
+            if(!masterService.sendMessage2health(msg)){
+                String ans = taskService.startTask(taskName,input,res);
+                log.info("master运行任务" + taskName);
+            }
             offlineService.putTask(taskName,5);
             status = new Status(0,"启动任务成功",taskName);
         }

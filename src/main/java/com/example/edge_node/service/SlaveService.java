@@ -2,7 +2,6 @@ package com.example.edge_node.service;
 
 import com.example.edge_node.cluster.dto.Message;
 import com.example.edge_node.cluster.slave.NettyClient;
-import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.config.SlaveCondition;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import java.util.Random;
 /**
  * Create by zhangran
  */
-//@Conditional(SlaveCondition.class)
+@Conditional(SlaveCondition.class)
 @Service
 @Slf4j
 public class SlaveService {

@@ -8,10 +8,7 @@ import com.example.edge_node.cluster.codec.NettyKryoDecoder;
 import com.example.edge_node.cluster.codec.NettyKryoEncoder;
 import com.example.edge_node.cluster.dto.Message;
 import com.example.edge_node.cluster.serialize.KryoSerializer;
-import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.config.SlaveCondition;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,33 +16,37 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 
 /**
  * @author shuang.kou
  * @createTime 2020年05月13日 20:48:00
  */
-//@Conditional(SlaveCondition.class)
+@Conditional(SlaveCondition.class)
 @Component
 @Slf4j
 public class NettyClient {
 
     private final String host;
     private final int port;
-    private static final Bootstrap b;
+    private Bootstrap b;
+    @Autowired
+    NettyClientHandler nettyClientHandler;
 
     public NettyClient(@Value("${server.master}") String host,@Value("${server.master_port}") int port) {
         this.host = host;
         this.port = port;
+        init();
     }
-
-    // 初始化相关资源比如 EventLoopGroup, Bootstrap
-    static {
+    private void init(){
+        // 初始化相关资源比如 EventLoopGroup, Bootstrap
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
         b = new Bootstrap();
         KryoSerializer kryoSerializer = new KryoSerializer();
@@ -65,10 +66,12 @@ public class NettyClient {
                         ch.pipeline().addLast(new NettyKryoDecoder(kryoSerializer, Message.class));
                         //  RpcRequest -> ByteBuf
                         ch.pipeline().addLast(new NettyKryoEncoder(kryoSerializer, Message.class));
-                        ch.pipeline().addLast(new NettyClientHandler());
+                        ch.pipeline().addLast(nettyClientHandler);
                     }
                 });
     }
+
+
 
     /**
      * 发送消息到服务端

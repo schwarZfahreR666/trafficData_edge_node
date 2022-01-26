@@ -4,9 +4,8 @@ import com.example.edge_node.cluster.codec.NettyKryoDecoder;
 import com.example.edge_node.cluster.codec.NettyKryoEncoder;
 import com.example.edge_node.cluster.dto.Message;
 import com.example.edge_node.cluster.serialize.KryoSerializer;
+
 import com.example.edge_node.config.MasterCondition;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -23,10 +22,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 /**
  * Create by zhangran
  */
-//@Conditional(MasterCondition.class)
+@Conditional(MasterCondition.class)
 @Component
 @Slf4j
 public class NettyServer {
@@ -72,6 +73,14 @@ public class NettyServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
+
+    @PostConstruct
+    public void start(){
+        new Thread(()->
+                run()
+        ).start();
+        log.info("netty服务器启动成功");
     }
 
 

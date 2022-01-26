@@ -20,7 +20,7 @@ import java.util.Date;
 @Conditional(MasterCondition.class)
 @Component
 @Slf4j
-public class ScheduledTasks {
+public class MasterScheduledTasks {
     @Autowired
     RegisterService registerService;
     @Autowired

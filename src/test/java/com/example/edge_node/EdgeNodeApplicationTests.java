@@ -53,9 +53,7 @@ class EdgeNodeApplicationTests {
     @Autowired
     OfflineService offlineService;
     @Autowired
-    SlaveService slaveService;
-    @Autowired
-    MasterService masterService;
+    TaskService taskService;
 
 
     @Test
@@ -241,13 +239,11 @@ class EdgeNodeApplicationTests {
         offlineService.scheduleTask();
     }
 
-    @Test
-    public void testCluster(){
-        slaveService.sendHealth();
-        Message message = Message.builder().taskName("road_info").build();
-        masterService.sendMessage2slave("123",message);
-    }
 
+    @Test
+    public void testStartTask(){
+        taskService.startTask("weather", "","no");
+    }
 
 
 

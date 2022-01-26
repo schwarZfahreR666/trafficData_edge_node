@@ -1,16 +1,14 @@
 package com.example.edge_node.cluster.master;
 
 import com.example.edge_node.cluster.dto.Message;
+import com.example.edge_node.config.MasterCondition;
 import com.example.edge_node.service.MasterService;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Create by zhangran
  */
-////@Conditional(MasterCondition.class)
+@Conditional(MasterCondition.class)
 @Component
 @Slf4j
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {

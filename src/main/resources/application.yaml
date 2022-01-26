@@ -1,6 +1,6 @@
 server:
-  master: "127.0.0.1"
-  master_port: 8888
+  master: "192.168.50.54"
+  master_port: 12367
   slave_id: 123
   nodeName: BUAA
   port: 9999
@@ -108,11 +108,10 @@ mybatis:
 #  config-location: classpath:mybatis/mybatis-config.xml
 
 docker:
-#  url: "tcp://192.168.0.201:2375"#"unix:///var/run/docker.sock"
-#  restUrl: "http://192.168.0.201:2375"
+#  url: "tcp://192.168.50.212:2375"#"unix:///var/run/docker.sock"
+#  restUrl: "http://192.168.50.212:2375"
   url: "tcp://127.0.0.1:2375"#"unix:///var/run/docker.sock"
   restUrl: "http://127.0.0.1:2375"
-  #"tcp://192.168.0.18:2375"
   filepath: /tmp/cache/files
 #文件存储路径
 filepath: /tmp/cache/files/
