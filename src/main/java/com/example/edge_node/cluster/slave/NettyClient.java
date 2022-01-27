@@ -84,7 +84,6 @@ public class NettyClient {
             ChannelFuture f = b.connect(host, port).sync();
             log.debug("client connect  {}", host + ":" + port);
             Channel futureChannel = f.channel();
-            log.debug("send message");
             if (futureChannel != null) {
                 futureChannel.writeAndFlush(rpcRequest).addListener(future -> {
                     if (future.isSuccess()) {

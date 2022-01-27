@@ -28,8 +28,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
             Message request = (Message) msg;
-            log.debug("server receive msg: [{}] ,times:[{}]", request, atomicInteger.getAndIncrement());
-            System.out.println(msg);
+            log.info("server receive msg: [{}] ,times:[{}]", request, atomicInteger.getAndIncrement());
             MasterService.putSlave(request.getRequestId(),request.getHealthScore(),ctx);
         } finally {
             ReferenceCountUtil.release(msg);

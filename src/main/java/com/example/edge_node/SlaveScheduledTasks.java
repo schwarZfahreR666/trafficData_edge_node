@@ -25,7 +25,7 @@ import java.util.Date;
 public class SlaveScheduledTasks {
     @Autowired
     SlaveService slaveService;
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 10000)
     public void register(){
         new Thread(()->
                 slaveService.sendHealth()
