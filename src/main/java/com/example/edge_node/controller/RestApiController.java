@@ -5,6 +5,7 @@ import com.example.edge_node.pojo.HostInfo;
 import com.example.edge_node.pojo.Image;
 import com.example.edge_node.pojo.SysMonitor;
 import com.example.edge_node.service.MonitorService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/rest")
+@Slf4j
 public class RestApiController {
     @Autowired
     MonitorService monitorService;
@@ -48,6 +50,7 @@ public class RestApiController {
     @GetMapping("/health")
     public String gethealth(){
         String health = "获取节点健康状况失败。";
+        log.info("获取节点健康度");
         try {
              health = monitorService.evalHealth();
         } catch (SocketException e) {

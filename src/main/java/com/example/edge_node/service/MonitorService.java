@@ -5,6 +5,7 @@ import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.edge_node.neo4j.BaseService;
+import com.example.edge_node.neo4j.BaseSession;
 import com.example.edge_node.pojo.*;
 import com.example.edge_node.utils.IpUtil;
 import com.github.dockerjava.api.DockerClient;
@@ -15,6 +16,7 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Info;
 import com.github.dockerjava.api.model.Statistics;
+import lombok.extern.slf4j.Slf4j;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -33,6 +35,7 @@ import oshi.hardware.CentralProcessor.TickType;
 
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -43,6 +46,7 @@ import static org.neo4j.driver.Values.parameters;
  * Create by zhangran
  */
 @Service
+@Slf4j
 public class MonitorService {
     @Autowired
     DockerService dockerService;
@@ -186,8 +190,11 @@ public class MonitorService {
 
     }
     public double getHealthScore() throws SocketException {
+
         SysMonitor sysMonitor = SystemMonitor();
+
         HostInfo hostInfo = getInfo();
+
         List<Container> ctns = containerService.list();
         List<String> ctnHealths = new ArrayList<>();
         for (Container ctn : ctns) {
@@ -209,7 +216,9 @@ public class MonitorService {
                 int exitCode = inspectContainerResponse.getState().getExitCode();
 
 
-                Session session = BaseService.DATASOURCE.getSession();
+//                Session session = BaseService.DATASOURCE.getSession();
+                BaseSession baseSession = new BaseSession();
+                Session session = baseSession.getSession();
                 Result result = session.run( "MATCH (c:container)-[:to]->(s:container) where c.name=$cpu_usage_name and c.lower_bound<=$cpu_usage_var and c.upper_bound>$cpu_usage_var return s.status as status" +
                                 " UNION ALL " +
                                 "MATCH (c:container)-[:to]->(s:container) where c.name=$health_name and c.status=$health_var return s.status as status" +
@@ -228,7 +237,9 @@ public class MonitorService {
                         ) );
 
 
+
                 Long state = result.list().stream().map(r->r.get("status").toString().replace("\"","")).filter(r->"unhealthy".equals(r)).count();
+                baseSession.close();
                 if(state >= 1){
                     ctnHealths.add("unhealthy");
                 }else{
@@ -241,14 +252,19 @@ public class MonitorService {
 
 
         int containersStopped = hostInfo.getContainersStopped();
+
         int containersRunning = hostInfo.getContainersRunning();
-        int healthyCount = (int)ctnHealths.stream().filter(a -> "healthy".equals(a)).count();
+
+        int healthyCount = (int)ctnHealths.stream().filter("healthy"::equals).count();
         float cpuSys = (float)sysMonitor.getCpuSys();
         float memUsage = (float)sysMonitor.getMemUsage();
         float cpuUsed = (float)sysMonitor.getCpuUsed();
         float cpuWait = (float)sysMonitor.getCpuWait();
 
-        Session session = BaseService.DATASOURCE.getSession();
+
+//        Session session = BaseService.DATASOURCE.getSession();
+        BaseSession baseSession = new BaseSession();
+        Session session = baseSession.getSession();
         Result result = session.run( "MATCH (c:node)-[:to]->(s:node) where c.name=$stop_name and c.lower_bound<=$stop_var and c.upper_bound>$stop_var return s.var as score" +
                         " UNION ALL " +
                         "MATCH (c:node)-[:to]->(s:node) where c.name=$sys_name and c.lower_bound<=$sys_var and c.upper_bound>$sys_var return s.var as score" +
@@ -266,7 +282,10 @@ public class MonitorService {
                         "wait_name","cpuWait","wait_var",cpuWait
                 ) );
 
+
+
         List<Integer> scores = result.stream().map(r -> r.get("score").asInt()).collect(Collectors.toList());
+        baseSession.close();
         double totalScore = 0;
         String eval = "节点";
         for(int i=0;i<scores.size();i++){
@@ -274,7 +293,9 @@ public class MonitorService {
             totalScore += score;
 
         }
+
         totalScore = ((float)healthyCount+1.0)/((float)containersRunning+1.0) * (float)totalScore;
+
 
 
 
@@ -286,7 +307,9 @@ public class MonitorService {
 
     public String evalHealth() throws SocketException {
         SysMonitor sysMonitor = SystemMonitor();
+
         HostInfo hostInfo = getInfo();
+
         List<Container> ctns = containerService.list();
         List<String> ctnHealths = new ArrayList<>();
         for (Container ctn : ctns) {
@@ -308,7 +331,9 @@ public class MonitorService {
                 int exitCode = inspectContainerResponse.getState().getExitCode();
 
 
-                Session session = BaseService.DATASOURCE.getSession();
+//                Session session = BaseService.DATASOURCE.getSession();
+                BaseSession baseSession = new BaseSession();
+                Session session = baseSession.getSession();
                 Result result = session.run( "MATCH (c:container)-[:to]->(s:container) where c.name=$cpu_usage_name and c.lower_bound<=$cpu_usage_var and c.upper_bound>$cpu_usage_var return s.status as status" +
                                 " UNION ALL " +
                                 "MATCH (c:container)-[:to]->(s:container) where c.name=$health_name and c.status=$health_var return s.status as status" +
@@ -327,7 +352,10 @@ public class MonitorService {
                         ) );
 
 
+
+
                 Long state = result.list().stream().map(r->r.get("status").toString().replace("\"","")).filter(r->"unhealthy".equals(r)).count();
+                baseSession.close();
                 if(state >= 1){
                     ctnHealths.add("unhealthy");
                 }else{
@@ -339,15 +367,22 @@ public class MonitorService {
         }
 
 
+
+
         int containersStopped = hostInfo.getContainersStopped();
+
         int containersRunning = hostInfo.getContainersRunning();
+
         int healthyCount = (int)ctnHealths.stream().filter(a -> "healthy".equals(a)).count();
         float cpuSys = (float)sysMonitor.getCpuSys();
         float memUsage = (float)sysMonitor.getMemUsage();
         float cpuUsed = (float)sysMonitor.getCpuUsed();
         float cpuWait = (float)sysMonitor.getCpuWait();
 
-        Session session = BaseService.DATASOURCE.getSession();
+
+//        Session session = BaseService.DATASOURCE.getSession();
+        BaseSession baseSession = new BaseSession();
+        Session session = baseSession.getSession();
         Result result = session.run( "MATCH (c:node)-[:to]->(s:node) where c.name=$stop_name and c.lower_bound<=$stop_var and c.upper_bound>$stop_var return s.var as score" +
                         " UNION ALL " +
                         "MATCH (c:node)-[:to]->(s:node) where c.name=$sys_name and c.lower_bound<=$sys_var and c.upper_bound>$sys_var return s.var as score" +
@@ -368,7 +403,14 @@ public class MonitorService {
 
 
         String[] ITEM = {"任务运行情况","系统资源占用情况","内存使用情况","CPU使用情况","任务阻塞情况"};
-        List<Integer> scores = result.stream().map(r -> r.get("score").asInt()).collect(Collectors.toList());
+        List<Integer> scores = null;
+        if(result.hasNext()){
+            scores = result.stream().map(r -> r.get("score").asInt()).collect(Collectors.toList());
+        }
+        else{
+            scores = new ArrayList(Collections.singleton(new int[]{15, 15, 15, 15, 15}));
+        }
+        baseSession.close();
         double totalScore = 0;
         String eval = "节点";
         for(int i=0;i<scores.size();i++){
@@ -381,7 +423,10 @@ public class MonitorService {
             totalScore += score;
 
         }
+
         totalScore = ((float)healthyCount+1.0)/((float)containersRunning+1.0) * (float)totalScore;
+
+
         eval += "健康评分为：" + totalScore;
 
 
