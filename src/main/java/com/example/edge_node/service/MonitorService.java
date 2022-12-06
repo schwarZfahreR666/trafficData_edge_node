@@ -59,25 +59,67 @@ public class MonitorService {
         String statistics = null;
 
         String containerID = id;
+        Status status = new Status();
 
         RestTemplate restTemplate =  new RestTemplate();
         statistics = restTemplate.getForObject(url + "/containers/"+containerID+"/stats?stream=0", String.class);
+        if(statistics == null) return status;
+        System.out.println(statistics);
         JSONObject jsonObject =  JSONObject.parseObject(statistics);
-        float used_memory = (jsonObject.getJSONObject("memory_stats").getFloat("usage") - jsonObject.getJSONObject("memory_stats").getJSONObject("stats").getFloat("cache")) / 1024;
-        float available_memory = jsonObject.getJSONObject("memory_stats").getFloat("limit") / 1024;
-        float memory_usage = (used_memory / available_memory) * 100;
-        float cpu_delta = (jsonObject.getJSONObject("cpu_stats").getJSONObject("cpu_usage").getFloat("total_usage") - jsonObject.getJSONObject("precpu_stats").getJSONObject("cpu_usage").getFloat("total_usage")) / 1024;
-        float system_cpu_delta = (jsonObject.getJSONObject("cpu_stats").getFloat("system_cpu_usage") - jsonObject.getJSONObject("precpu_stats").getFloat("system_cpu_usage")) / 1024;
-        int number_cpus = jsonObject.getJSONObject("cpu_stats").getJSONObject("cpu_usage").getJSONArray("percpu_usage").size();
-        float cpu_usage = (cpu_delta / system_cpu_delta) * number_cpus * 100;
-        Status status = new Status();
-        status.setAvailable_memory(available_memory);
-        status.setCpu_delta(cpu_delta);
-        status.setCpu_usage(cpu_usage);
-        status.setMemory_usage(memory_usage);
-        status.setNumber_cpus(number_cpus);
-        status.setUsed_memory(used_memory);
-        status.setSystem_cpu_delta(system_cpu_delta);
+
+        JSONObject memory_stats = jsonObject.getJSONObject("memory_stats");
+        if(memory_stats != null){
+            Float usage = memory_stats.getFloat("usage");
+            Float cache = null;
+            JSONObject stats = memory_stats.getJSONObject("stats");
+            if(stats != null) {
+                cache = stats.getFloat("cache");
+            }
+            float used_memory = 0;
+            if(usage != null && cache != null){
+                used_memory = (usage - cache) / 1024;
+            }
+            float available_memory = 0.01f;
+            if(memory_stats.getFloat("limit") != null){
+                available_memory = memory_stats.getFloat("limit") / 1024;
+            }
+            float memory_usage = (used_memory / available_memory) * 100;
+            status.setAvailable_memory(available_memory);
+            status.setMemory_usage(memory_usage);
+            status.setUsed_memory(used_memory);
+        }
+        JSONObject cpu_stats = jsonObject.getJSONObject("cpu_stats");
+        if(cpu_stats != null){
+            JSONObject _cpu_usage = cpu_stats.getJSONObject("cpu_usage");
+            Float system_cpu_usage = cpu_stats.getFloat("system_cpu_usage");
+            JSONObject precpu_stats = jsonObject.getJSONObject("precpu_stats");
+            float cpu_delta = 0;
+            if(_cpu_usage != null && _cpu_usage.getFloat("total_usage") != null && precpu_stats != null && precpu_stats.getJSONObject("cpu_usage") != null && precpu_stats.getJSONObject("cpu_usage").getFloat("total_usage") != null){
+                cpu_delta = (cpu_stats.getJSONObject("cpu_usage").getFloat("total_usage") - jsonObject.getJSONObject("precpu_stats").getJSONObject("cpu_usage").getFloat("total_usage")) / 1024;
+            }
+            float system_cpu_delta = 0.01f;
+            if(cpu_stats.getFloat("system_cpu_usage") != null && precpu_stats.getFloat("system_cpu_usage") != null){
+                system_cpu_delta = (cpu_stats.getFloat("system_cpu_usage") - jsonObject.getJSONObject("precpu_stats").getFloat("system_cpu_usage")) / 1024;
+            }
+            int number_cpus = 0;
+            if(_cpu_usage.getJSONArray("percpu_usage") != null){
+                number_cpus = _cpu_usage.getJSONArray("percpu_usage").size();
+            }
+            float cpu_usage = (cpu_delta / system_cpu_delta) * number_cpus * 100;
+
+            status.setCpu_delta(cpu_delta);
+            status.setCpu_usage(cpu_usage);
+
+            status.setNumber_cpus(number_cpus);
+
+            status.setSystem_cpu_delta(system_cpu_delta);
+        }
+
+
+
+
+
+
 
         return status;
 
@@ -201,6 +243,7 @@ public class MonitorService {
             String id = ctn.getId();
 
             InspectContainerResponse inspectContainerResponse = inspectContainer(id);
+            if(inspectContainerResponse == null) continue;
             String status = inspectContainerResponse.getState().getStatus();
             if("running".equals(status)){
                 HealthState healthState = inspectContainerResponse.getState().getHealth();
